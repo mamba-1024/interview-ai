@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "AI模拟面试 - InterviewAI",
+  "version": "1.0.0",
+  "description": "AI模拟面试助手：自动识别招聘网站岗位描述，一键生成面试题，支持AI追问和评分",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.zhipin.com/*",
+    "https://www.lagou.com/*",
+    "https://www.linkedin.com/*",
+    "https://www.zhaopin.com/*",
+    "https://www.51job.com/*",
+    "https://www.liepin.com/*",
+    "https://www.liepin.com/zhaopin/*",
+    "https://www.nowcoder.com/*",
+    "https://dashscope.aliyuncs.com/*",
+    "https://api.openai.com/*",
+    "https://api.deepseek.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.zhipin.com/*",
+        "https://www.lagou.com/*",
+        "https://www.linkedin.com/jobs/*",
+        "https://www.zhaopin.com/*",
+        "https://www.51job.com/*",
+        "https://www.liepin.com/*",
+        "https://www.nowcoder.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

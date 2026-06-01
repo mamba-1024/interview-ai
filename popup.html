@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 模拟面试</title>
+  <link rel="stylesheet" href="popup/styles/popup.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>
+          </svg>
+        </div>
+        <div>
+          <div class="header-title">AI 模拟面试</div>
+          <div class="header-sub">InterviewAI Pro</div>
+        </div>
+      </div>
+      <button id="btnSettings" class="icon-btn" title="设置">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Setup View -->
+      <section id="viewSetup" class="view">
+        <div class="setup-card">
+          <div class="setup-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          </div>
+          <div class="setup-title">配置 AI 服务</div>
+          <div class="setup-desc">首次使用需要配置大模型 API Key，支持 DeepSeek、OpenAI 等兼容接口</div>
+          <div class="form-group">
+            <label>API 地址</label>
+            <input id="inputApiUrl" type="text" placeholder="https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions" />
+          </div>
+          <div class="form-group">
+            <label>API Key</label>
+            <input id="inputApiKey" type="password" placeholder="sk-..." />
+          </div>
+          <div class="form-group">
+            <label>模型名称</label>
+            <input id="inputModel" type="text" placeholder="glm-5" />
+          </div>
+          <button id="btnSaveConfig" class="btn btn-primary">保存配置</button>
+        </div>
+      </section>
+
+      <!-- Home View -->
+      <section id="viewHome" class="view hidden">
+        <!-- JD 检测状态 -->
+        <div id="jdStatus" class="jd-status">
+          <div class="status-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div class="status-text">
+            <span id="jdStatusText">正在检测页面...</span>
+          </div>
+        </div>
+
+        <!-- JD 信息展示 -->
+        <div id="jdInfo" class="jd-info hidden">
+          <div class="jd-info-header">
+            <span id="jdTitle" class="jd-title"></span>
+            <span id="jdCompany" class="jd-company"></span>
+          </div>
+          <div id="jdSalary" class="jd-salary"></div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="actions">
+          <button id="btnExtractJD" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            提取并分析 JD
+          </button>
+
+          <button id="btnManualJD" class="btn btn-outline btn-sm">
+            手动粘贴 JD
+          </button>
+        </div>
+
+        <!-- 手动输入区域 -->
+        <div id="manualJDSection" class="manual-jd hidden">
+          <textarea id="manualJDInput" placeholder="粘贴岗位描述内容..." rows="4"></textarea>
+          <button id="btnAnalyzeManual" class="btn btn-primary btn-sm">分析此 JD</button>
+        </div>
+
+        <!-- 分析结果 -->
+        <div id="analysisResult" class="analysis-result hidden">
+          <div class="result-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+            <span>分析完成</span>
+          </div>
+          <div id="analysisContent" class="analysis-content"></div>
+        </div>
+
+        <!-- 面试题目 -->
+        <div id="questionsSection" class="questions-section hidden">
+          <div class="section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            生成的面试题
+          </div>
+          <div id="questionsList" class="questions-list"></div>
+          <button id="btnStartInterview" class="btn btn-accent">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            开始模拟面试
+          </button>
+        </div>
+
+        <!-- 使用统计 -->
+        <div id="usageStats" class="usage-stats">
+          <span>今日使用: <strong id="todayCount">0</strong> 次</span>
+          <span>·</span>
+          <span>累计: <strong id="totalCount">0</strong> 次</span>
+        </div>
+      </section>
+
+      <!-- Loading -->
+      <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <div id="loadingText" class="loading-text">处理中...</div>
+      </div>
+    </main>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
