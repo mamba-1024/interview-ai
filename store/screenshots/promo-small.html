@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  width: 440px;
+  height: 280px;
+  overflow: hidden;
+  font-family: -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+.promo {
+  width: 440px;
+  height: 280px;
+  background: linear-gradient(135deg, #6C5CE7 0%, #4834D4 40%, #341F97 100%);
+  display: flex;
+  align-items: center;
+  padding: 30px 36px;
+  position: relative;
+  overflow: hidden;
+}
+/* Decorative circles */
+.promo::before {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  top: -60px;
+  right: -40px;
+}
+.promo::after {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  bottom: -30px;
+  left: 20px;
+}
+.left {
+  flex: 1;
+  z-index: 2;
+}
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  backdrop-filter: blur(4px);
+}
+.logo-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 0.5px;
+}
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.35;
+  margin-bottom: 10px;
+}
+.subtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.5;
+}
+.right {
+  width: 140px;
+  height: 180px;
+  z-index: 2;
+  flex-shrink: 0;
+  margin-left: 12px;
+  position: relative;
+}
+.mock-card {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.2);
+  position: absolute;
+}
+.mock-card.main {
+  width: 140px;
+  top: 0;
+  right: 0;
+}
+.mock-card.float {
+  width: 120px;
+  bottom: 0;
+  right: 10px;
+}
+.mock-label {
+  font-size: 8px;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.mock-bar {
+  height: 4px;
+  border-radius: 2px;
+  margin-bottom: 5px;
+}
+.mock-bar.b1 { background: rgba(255,255,255,0.5); width: 90%; }
+.mock-bar.b2 { background: rgba(255,255,255,0.3); width: 70%; }
+.mock-bar.b3 { background: rgba(255,255,255,0.2); width: 55%; }
+.mock-score {
+  font-size: 28px;
+  font-weight: 700;
+  color: #7BED9F;
+  text-align: center;
+  margin: 4px 0;
+}
+.mock-score-label {
+  font-size: 8px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+}
+.mock-tags {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.mock-tag {
+  font-size: 7px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.8);
+}
+</style>
+</head>
+<body>
+<div class="promo">
+  <div class="left">
+    <div class="logo-row">
+      <div class="logo-icon">AI</div>
+      <div class="logo-text">Interview AI Pro</div>
+    </div>
+    <div class="title">AI 模拟面试<br>助你斩获 Offer</div>
+    <div class="subtitle">智能分析 JD · 定制面试题 · AI 评分反馈</div>
+  </div>
+  <div class="right">
+    <div class="mock-card main">
+      <div class="mock-label">面试报告</div>
+      <div class="mock-score">83</div>
+      <div class="mock-score-label">综合评分</div>
+      <div class="mock-bar b1"></div>
+      <div class="mock-bar b2"></div>
+      <div class="mock-bar b3"></div>
+    </div>
+    <div class="mock-card float">
+      <div class="mock-label">核心技能</div>
+      <div class="mock-tags">
+        <span class="mock-tag">React</span>
+        <span class="mock-tag">TypeScript</span>
+        <span class="mock-tag">Node.js</span>
+        <span class="mock-tag">Webpack</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
