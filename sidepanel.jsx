@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
+import InterviewRoom from './components/InterviewRoom.jsx';
 
 // ---- SVG Icons ----
 const Icons = {
@@ -44,6 +45,15 @@ function sendMsg(action, data = {}) {
     });
   });
 }
+
+// AI Service adapter for InterviewRoom - wraps sendMsg to match aiService interface
+const aiServiceAdapter = {
+  async evaluateAnswer(question, answer, jdAnalysis) {
+    const resp = await sendMsg('evaluateAnswer', { question, answer, analysis: jdAnalysis });
+    if (resp?.success && resp.evaluation) return resp.evaluation;
+    throw new Error(resp?.error || 'Evaluation failed');
+  },
+};
 
 // ---- Score Bar ----
 function ScoreBar({ label, score, color, barDelay = 0 }) {
@@ -108,6 +118,7 @@ function App() {
   const [timerOn, setTimerOn] = useState(false);
   const [expandTip, setExpandTip] = useState(false);
   const [summary, setSummary] = useState(null);
+  const [showInterviewRoom, setShowInterviewRoom] = useState(false);
 
   const chatEndRef = useRef(null);
   const timerRef = useRef(null);
@@ -156,22 +167,43 @@ function App() {
       }
     }
 
-    // Try detect JD from current page (skip in tab mode)
-    if (!isTabMode && !dataResp?.jd) {
-      tryDetectJD();
+    // 每次打开都尝试检测当前页面 JD（非 tab 模式）
+    // 如果检测到新的 JD（不同页面），自动刷新；否则保留缓存数据
+    if (!isTabMode) {
+      tryDetectJD(dataResp?.jd);
     } else if (dataResp?.jd) {
       setJdStatus('found');
     }
   }
 
-  async function tryDetectJD() {
+  async function tryDetectJD(storedJd) {
     setJdStatus('detecting');
     const resp = await sendMsg('extractJD');
     if (resp?.success && resp.fullText?.length > 30) {
+      // 检测是否为新的 JD（与缓存不同）
+      const isSameJD = storedJd && resp.source === storedJd.source && resp.fullText === storedJd.fullText;
+      if (isSameJD) {
+        // 同一个 JD，不重新加载
+        setJdStatus('found');
+        return;
+      }
+      // 新的 JD → 更新并清除旧的分析/题目/历史
       setJd(resp);
       setJdStatus('found');
+      if (storedJd) {
+        setAnalysis(null);
+        setQuestions([]);
+        setHistory([]);
+        setSummary(null);
+        sendMsg('clearSession');
+      }
     } else {
-      setJdStatus('none');
+      // 未检测到 JD，如果有缓存数据则保留
+      if (!storedJd) {
+        setJdStatus('none');
+      } else {
+        setJdStatus('found');
+      }
     }
   }
 
@@ -637,6 +669,10 @@ function App() {
               onClick={startInterview}>
               <Icons.Zap size={16} /> 开始模拟面试 ({questions.length}题)
             </button>
+            <button className="sp-action-btn" style={{ width: '100%', marginTop: 8, background: 'linear-gradient(135deg, #6C5CE7, #4834D4)', color: '#fff', borderColor: 'transparent' }}
+              onClick={() => setShowInterviewRoom(true)}>
+              <Icons.Target size={16} /> 视频面试间
+            </button>
           </div>
         )}
 
@@ -960,6 +996,20 @@ function App() {
 
   return (
     <>
+      {showInterviewRoom && analysis && questions.length > 0 && (
+        <InterviewRoom
+          questions={questions}
+          jdAnalysis={analysis}
+          aiService={aiServiceAdapter}
+          onComplete={(hist, time) => {
+            setShowInterviewRoom(false);
+            setHistory(hist);
+            setTotalTime(time);
+            setScreen('summary');
+          }}
+          onExit={() => setShowInterviewRoom(false)}
+        />
+      )}
       {renderHeader()}
       {screen === 'setup' && renderSetup()}
       {screen === 'home' && renderHome()}

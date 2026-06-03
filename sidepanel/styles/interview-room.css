@@ -1,0 +1,996 @@
+/* ============================================================
+   Interview Room Styles - 视频面试间
+   深色主题，模拟线上视频面试场景
+   ============================================================ */
+
+.ir-room {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #0F0B1E;
+  display: flex;
+  flex-direction: column;
+  z-index: 9999;
+  font-family: -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: #fff;
+}
+
+/* ---- 顶部信息栏 ---- */
+.ir-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.ir-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ir-logo {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #6C5CE7, #A29BFE);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ir-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+}
+
+.ir-topbar-center {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ir-timer {
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #7BED9F;
+  letter-spacing: 1px;
+}
+
+.ir-progress {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  padding: 4px 12px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 20px;
+}
+
+.ir-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ir-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.ir-icon-btn:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+.ir-icon-btn--active {
+  background: rgba(108,92,231,0.3);
+  color: #A29BFE;
+}
+
+.ir-exit-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,99,99,0.4);
+  background: rgba(255,99,99,0.1);
+  color: #FF6B6B;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ir-exit-btn:hover {
+  background: rgba(255,99,99,0.2);
+  border-color: rgba(255,99,99,0.6);
+}
+
+/* ---- 视频区域（紧凑） ---- */
+.ir-video-row {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px 0;
+  flex-shrink: 0;
+  max-height: 200px;
+}
+
+.ir-video-cell {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ir-video-inner {
+  background: linear-gradient(145deg, rgba(108,92,231,0.15), rgba(52,31,151,0.1));
+  border: 1px solid rgba(108,92,231,0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto;
+}
+
+.ir-video-inner .ir-avatar-wrap {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.ir-video-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  padding: 0 2px;
+}
+
+.ir-video-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  flex-shrink: 0;
+}
+
+.ir-video-dot--active {
+  background: #7BED9F;
+  animation: irPulse 1s ease-in-out infinite;
+}
+
+.ir-video-dot--user {
+  background: #74B9FF;
+}
+
+.ir-video-status {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  margin-left: auto;
+}
+
+@keyframes irPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* ---- 题目 Tab 栏 ---- */
+.ir-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.ir-tabs::-webkit-scrollbar { display: none; }
+
+.ir-tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.5);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.ir-tab:hover {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.7);
+}
+
+.ir-tab--active {
+  background: rgba(108,92,231,0.25);
+  border-color: rgba(108,92,231,0.4);
+  color: #A29BFE;
+  font-weight: 500;
+}
+
+.ir-tab--done {
+  border-color: rgba(123,237,159,0.2);
+}
+.ir-tab--done .ir-tab-check {
+  color: #7BED9F;
+  font-size: 10px;
+}
+
+.ir-tab-tag {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  margin-right: 2px;
+}
+.ir-tab-tag--technical { background: rgba(116,185,255,0.15); color: #74B9FF; }
+.ir-tab-tag--project { background: rgba(253,203,110,0.15); color: #FDCB6E; }
+.ir-tab-tag--scenario { background: rgba(162,155,254,0.15); color: #A29BFE; }
+.ir-tab-tag--behavioral { background: rgba(255,118,117,0.15); color: #FF7675; }
+
+/* ---- 文字区域 ---- */
+.ir-text-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+/* 题目字幕 */
+.ir-subtitle-box {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.ir-subtitle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 8px;
+}
+
+.ir-q-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.ir-q-tag--technical { background: rgba(116,185,255,0.2); color: #74B9FF; }
+.ir-q-tag--project { background: rgba(253,203,110,0.2); color: #FDCB6E; }
+.ir-q-tag--scenario { background: rgba(162,155,254,0.2); color: #A29BFE; }
+.ir-q-tag--behavioral { background: rgba(255,118,117,0.2); color: #FF7675; }
+
+.ir-subtitle-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.85);
+}
+
+/* 摄像头 */
+.ir-camera-box {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1A1230;
+  border: 1px solid rgba(255,255,255,0.08);
+  width: 140px;
+  height: 140px;
+  margin: 0 auto;
+}
+
+.ir-camera-box--off {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ir-camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* 镜像 */
+}
+
+.ir-camera-off {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: rgba(255,255,255,0.4);
+  font-size: 11px;
+  width: 100%;
+  height: 100%;
+}
+
+.ir-camera-off svg {
+  width: 24px;
+  height: 24px;
+}
+
+.ir-camera-error {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 12px;
+  background: rgba(255,99,99,0.2);
+  color: #FF6B6B;
+  font-size: 11px;
+  text-align: center;
+}
+
+.ir-camera-label {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 3px 10px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 6px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+}
+
+/* 用户回答区域 */
+.ir-answer-box {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.ir-answer-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ir-answer-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.85);
+}
+
+.ir-placeholder {
+  color: rgba(255,255,255,0.3);
+  font-style: italic;
+}
+
+.ir-interim {
+  color: rgba(255,255,255,0.4);
+  font-style: italic;
+}
+
+/* 评估结果展示 */
+.ir-score-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.ir-score-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+}
+.ir-score-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #7BED9F;
+}
+
+.ir-eval-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.ir-eval-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.ir-eval-tag--good { background: rgba(123,237,159,0.15); color: #7BED9F; }
+.ir-eval-tag--tip { background: rgba(253,203,110,0.15); color: #FDCB6E; }
+.ir-eval-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.7);
+}
+
+/* 重新作答按钮 */
+.ir-retry-row {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ir-retry-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(108,92,231,0.35);
+  background: rgba(108,92,231,0.12);
+  color: #A29BFE;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ir-retry-btn:hover {
+  background: rgba(108,92,231,0.25);
+  border-color: rgba(108,92,231,0.5);
+  color: #fff;
+}
+
+.ir-retry-btn svg {
+  flex-shrink: 0;
+}
+
+/* 时长标记 */
+.ir-duration-badge {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.06);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.ir-score-duration {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.4);
+}
+
+.ir-live-duration {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 500;
+  color: #7BED9F;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 操作按钮栏 */
+.ir-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.ir-action-bar--center {
+  justify-content: center;
+  border-top: none;
+  padding-top: 4px;
+}
+
+.ir-action-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+}
+
+.ir-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.8);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ir-action-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.ir-action-btn svg {
+  flex-shrink: 0;
+}
+
+.ir-action-btn--stop {
+  border-color: rgba(255,99,99,0.3);
+  background: rgba(255,99,99,0.1);
+  color: #FF6B6B;
+}
+
+.ir-action-btn--stop:hover {
+  background: rgba(255,99,99,0.2);
+  border-color: rgba(255,99,99,0.5);
+}
+
+.ir-action-btn--submit {
+  border-color: rgba(108,92,231,0.4);
+  background: rgba(108,92,231,0.15);
+  color: #A29BFE;
+}
+
+.ir-action-btn--submit:hover {
+  background: rgba(108,92,231,0.3);
+  border-color: rgba(108,92,231,0.6);
+  color: #fff;
+}
+
+.ir-action-btn--start {
+  border-color: rgba(123,237,159,0.35);
+  background: rgba(123,237,159,0.1);
+  color: #7BED9F;
+}
+
+.ir-action-btn--start:hover {
+  background: rgba(123,237,159,0.2);
+  border-color: rgba(123,237,159,0.5);
+  color: #fff;
+}
+
+/* 重新作答 - 上次回答参考 */
+.ir-retry-ref {
+  background: rgba(253,203,110,0.06);
+  border: 1px solid rgba(253,203,110,0.15);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.ir-retry-ref-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(253,203,110,0.8);
+  margin-bottom: 8px;
+}
+
+.ir-retry-ref-header svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.ir-retry-ref-score {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(253,203,110,0.6);
+}
+
+.ir-retry-ref-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.45);
+  max-height: 80px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+.ir-retry-ref-text::-webkit-scrollbar {
+  width: 4px;
+}
+.ir-retry-ref-text::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+}
+
+.ir-retry-ref-tips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.ir-retry-ref-tip {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(253,203,110,0.1);
+  border-radius: 4px;
+  font-size: 11px;
+  color: rgba(253,203,110,0.7);
+  line-height: 1.5;
+}
+
+/* ---- 底部控制栏 ---- */
+.ir-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 24px;
+  background: rgba(255,255,255,0.04);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+
+.ir-ctrl-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.8);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ir-ctrl-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.ir-ctrl-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ir-ctrl-btn--off {
+  background: rgba(255,99,99,0.15);
+  border-color: rgba(255,99,99,0.3);
+  color: #FF6B6B;
+}
+
+.ir-ctrl-btn--active {
+  background: rgba(123,237,159,0.15);
+  border-color: rgba(123,237,159,0.3);
+  color: #7BED9F;
+  animation: irMicPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes irMicPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(123,237,159,0.2); }
+  50% { box-shadow: 0 0 0 8px rgba(123,237,159,0); }
+}
+
+.ir-ctrl-btn--submit {
+  background: linear-gradient(135deg, #6C5CE7, #4834D4);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 500;
+}
+
+.ir-ctrl-btn--submit:hover {
+  background: linear-gradient(135deg, #7C6CF7, #5844E4);
+}
+
+/* ---- 面试完成横幅 ---- */
+.ir-done-banner {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(123,237,159,0.12), rgba(108,92,231,0.1));
+  border-bottom: 1px solid rgba(123,237,159,0.15);
+  padding: 10px 16px;
+  animation: irBannerSlide 0.35s ease-out;
+}
+
+@keyframes irBannerSlide {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ir-done-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ir-done-banner-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.ir-done-banner-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ir-done-banner-info strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+}
+
+.ir-done-banner-info span {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+}
+
+.ir-done-banner-report {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #6C5CE7, #4834D4);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.ir-done-banner-report:hover {
+  background: linear-gradient(135deg, #7C6CF7, #5844E4);
+}
+
+.ir-done-banner-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.ir-done-banner-close:hover {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.7);
+}
+
+/* 底部栏 - 面试结束摘要 */
+.ir-done-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  flex: 1;
+}
+
+.ir-done-summary span {
+  display: flex;
+  align-items: center;
+}
+
+/* ---- Avatar 样式 ---- */
+.ir-avatar-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ir-avatar-glow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(108,92,231,0.1) 0%, transparent 70%);
+  transition: all 0.4s;
+}
+
+.ir-avatar-glow--active {
+  inset: -16px;
+  background: radial-gradient(circle, rgba(108,92,231,0.25) 0%, transparent 70%);
+  animation: irGlowPulse 1s ease-in-out infinite;
+}
+
+@keyframes irGlowPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.ir-avatar-img {
+  position: relative;
+  z-index: 1;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* 说话状态指示器 */
+.ir-avatar-status {
+  position: absolute;
+  bottom: -8px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.ir-avatar-status--speaking {
+  animation: irFadeIn 0.3s;
+}
+
+.ir-wave-bar {
+  width: 3px;
+  background: #7BED9F;
+  border-radius: 2px;
+  animation: irWave 0.8s ease-in-out infinite;
+}
+
+.ir-wave-bar:nth-child(1) {
+  height: 12px;
+  animation-delay: 0s;
+}
+
+.ir-wave-bar:nth-child(2) {
+  height: 18px;
+  animation-delay: 0.2s;
+}
+
+.ir-wave-bar:nth-child(3) {
+  height: 10px;
+  animation-delay: 0.4s;
+}
+
+@keyframes irWave {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.4); }
+}
+
+@keyframes irFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- STT 错误提示 ---- */
+.ir-stt-error {
+  background: rgba(255,165,0,0.12);
+  border: 1px solid rgba(255,165,0,0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: #FFB84D;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ir-stt-hint {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+}
+
+/* ---- 手动文字输入框 ---- */
+.ir-manual-input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.9);
+  font-size: 13px;
+  line-height: 1.6;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ir-manual-input:focus {
+  border-color: rgba(108,92,231,0.5);
+  background: rgba(255,255,255,0.08);
+}
+
+.ir-manual-input::placeholder {
+  color: rgba(255,255,255,0.3);
+  font-style: italic;
+}
+
+/* ---- 麦克风检测 ---- */
+.ir-mic-level {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+  margin-left: 4px;
+}
+
+.ir-mic-level-bar {
+  width: 3px;
+  min-height: 4px;
+  background: #7BED9F;
+  border-radius: 1.5px;
+  transition: height 0.1s ease-out;
+}
+
+.ir-mic-warn {
+  font-size: 11px;
+  color: #FF6B6B;
+  white-space: nowrap;
+}
+
+.ir-mic-checking {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+}
+
+/* ---- 响应式 ---- */
+@media (max-width: 900px) {
+  .ir-video-row {
+    gap: 8px;
+    padding: 12px 12px 0;
+  }
+  .ir-video-inner {
+    padding: 12px;
+    border-radius: 12px;
+  }
+  .ir-text-area {
+    padding: 10px 12px;
+  }
+  .ir-topbar {
+    padding: 10px 12px;
+  }
+  .ir-controls {
+    gap: 10px;
+    padding: 12px;
+  }
+  .ir-ctrl-btn {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+}
