@@ -681,35 +681,42 @@ function App() {
       </div>
 
       <div className={`sp-chat${isTabMode ? ' sp-tab-mode' : ''}`}>
-        {history.filter(h => h.type !== 'followup').map((h, i) => (
-          <div key={i}>
-            <div className="sp-msg sp-msg-bot">
-              <div className="sp-avatar sp-avatar-bot"><Icons.Bot size={14} /></div>
-              <div>
-                <div className={`sp-q-badge ${h.type}`}>
-                  <div className="sp-dot-sm" />{h.typeLabel}
+        {(() => {
+          // 排除 followup，且当前正在展示的题目（scoring/feedback）从 history 中排除避免重复
+          let items = history.filter(h => h.type !== 'followup');
+          if ((showFeedback || phase === 'scoring') && items.length > 0) {
+            items = items.slice(0, -1);
+          }
+          return items.map((h, i) => (
+            <div key={i}>
+              <div className="sp-msg sp-msg-bot">
+                <div className="sp-avatar sp-avatar-bot"><Icons.Bot size={14} /></div>
+                <div>
+                  <div className={`sp-q-badge ${h.type}`}>
+                    <div className="sp-dot-sm" />{h.typeLabel}
+                  </div>
+                  <div className="sp-bubble sp-bubble-bot">{h.question}</div>
                 </div>
-                <div className="sp-bubble sp-bubble-bot">{h.question}</div>
               </div>
+              <div className="sp-msg sp-msg-user" style={{ marginTop: 8 }}>
+                <div className="sp-avatar sp-avatar-user"><Icons.User size={14} /></div>
+                <div className="sp-bubble sp-bubble-user">
+                  {h.answer.length > 80 ? h.answer.slice(0, 80) + '...' : h.answer}
+                </div>
+              </div>
+              {h.evaluation?.scores?.overall && (
+                <div style={{
+                  marginLeft: 36, marginTop: 4, display: 'inline-flex',
+                  alignItems: 'center', gap: 4, padding: '2px 8px',
+                  borderRadius: 6, background: 'var(--accent-light)', fontSize: 11,
+                }}>
+                  <Icons.Award size={11} />
+                  <span style={{ color: 'var(--accent)', fontWeight: 600 }}>{h.evaluation.scores.overall}分</span>
+                </div>
+              )}
             </div>
-            <div className="sp-msg sp-msg-user" style={{ marginTop: 8 }}>
-              <div className="sp-avatar sp-avatar-user"><Icons.User size={14} /></div>
-              <div className="sp-bubble sp-bubble-user">
-                {h.answer.length > 80 ? h.answer.slice(0, 80) + '...' : h.answer}
-              </div>
-            </div>
-            {h.evaluation?.scores?.overall && (
-              <div style={{
-                marginLeft: 36, marginTop: 4, display: 'inline-flex',
-                alignItems: 'center', gap: 4, padding: '2px 8px',
-                borderRadius: 6, background: 'var(--accent-light)', fontSize: 11,
-              }}>
-                <Icons.Award size={11} />
-                <span style={{ color: 'var(--accent)', fontWeight: 600 }}>{h.evaluation.scores.overall}分</span>
-              </div>
-            )}
-          </div>
-        ))}
+          ));
+        })()}
 
         {phase !== 'idle' && (
           <div className="sp-msg sp-msg-bot">
@@ -734,15 +741,21 @@ function App() {
         )}
 
         {phase === 'scoring' && (
-          <div className="sp-msg sp-msg-bot">
-            <div className="sp-avatar sp-avatar-bot"><Icons.Bot size={14} /></div>
-            <div className="sp-bubble sp-bubble-bot">
-              <div className="sp-scoring">
-                <div className="sp-mini-spinner" />
-                <span style={{ color: 'var(--text-mid)', fontSize: 12 }}>AI 正在分析你的回答...</span>
+          <>
+            <div className="sp-msg sp-msg-user">
+              <div className="sp-avatar sp-avatar-user"><Icons.User size={14} /></div>
+              <div className="sp-bubble sp-bubble-user">{answer}</div>
+            </div>
+            <div className="sp-msg sp-msg-bot">
+              <div className="sp-avatar sp-avatar-bot"><Icons.Bot size={14} /></div>
+              <div className="sp-bubble sp-bubble-bot">
+                <div className="sp-scoring">
+                  <div className="sp-mini-spinner" />
+                  <span style={{ color: 'var(--text-mid)', fontSize: 12 }}>AI 正在分析你的回答...</span>
+                </div>
               </div>
             </div>
-          </div>
+          </>
         )}
 
         {showFeedback && feedback && (

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{width:1280px;height:800px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif;background:#e8ecf1;}
+.wrapper{display:flex;width:1280px;height:800px;}
+/* Left: simulated web page */
+.left{flex:1;background:#f5f6f7;position:relative;overflow:hidden;}
+.left-nav{height:48px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;padding:0 24px;gap:16px;}
+.left-nav .logo{font-size:16px;font-weight:700;color:#00c2a8;}
+.left-content{padding:20px 24px;}
+.fake-card{background:#fff;border-radius:10px;padding:20px;margin-bottom:12px;}
+.fake-card .title{font-size:16px;font-weight:600;color:#333;margin-bottom:8px;}
+.fake-card .sub{font-size:12px;color:#999;}
+.fake-bar{height:8px;background:#f0f0f0;border-radius:4px;margin:6px 0;}
+.fake-bar.w60{width:60%}.fake-bar.w80{width:80%}.fake-bar.w40{width:40%}
+/* Right: Side Panel */
+.right{width:420px;height:800px;background:#f8fafc;border-left:1px solid #e2e8f0;display:flex;flex-direction:column;position:relative;}
+.panel-header{background:linear-gradient(135deg,#4F46E5,#7C3AED,#6366F1);padding:14px 18px;color:#fff;display:flex;align-items:center;gap:10px;}
+.panel-logo{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;}
+.panel-logo svg{width:18px;height:18px;}
+.panel-title{font-size:15px;font-weight:700;}
+.panel-subtitle{font-size:10px;opacity:0.7;}
+.panel-body{flex:1;padding:16px;overflow:hidden;display:flex;flex-direction:column;gap:12px;}
+/* JD status */
+.jd-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:#ecfdf5;color:#065f46;font-size:12px;}
+.jd-status svg{width:14px;height:14px;flex-shrink:0;}
+/* Analysis card */
+.analysis-card{padding:14px;border-radius:10px;background:#ecfdf5;border:1px solid #a7f3d0;animation:none;}
+.section-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.section-title.success{color:#059669;}
+.section-title.primary{color:#4F46E5;}
+.analysis-body{font-size:12px;color:#475569;line-height:1.7;}
+.analysis-body strong{color:#065f46;}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;background:#d1fae5;color:#065f46;font-size:11px;margin:2px;font-weight:500;}
+/* Questions */
+.questions-section{flex:1;display:flex;flex-direction:column;}
+.q-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.q-row{display:flex;align-items:flex-start;gap:6px;padding:10px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;line-height:1.5;}
+.q-num{font-size:11px;color:#94a3b8;font-weight:600;flex-shrink:0;min-width:20px;}
+.q-type{font-size:10px;padding:1px 6px;border-radius:4px;font-weight:600;flex-shrink:0;white-space:nowrap;}
+.q-type.tech{background:#dbeafe;color:#1e40af;}
+.q-type.proj{background:#fef3c7;color:#92400e;}
+.q-type.scene{background:#e0e7ff;color:#3730a3;}
+.q-type.behav{background:#fce7f3;color:#9d174d;}
+.q-text{color:#1e293b;flex:1;}
+/* Start button */
+.start-btn{width:100%;padding:12px;border-radius:10px;border:none;color:#fff;font-size:14px;font-weight:600;background:linear-gradient(135deg,#4F46E5,#6366F1,#3730A3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;box-shadow:0 4px 14px rgba(79,70,229,0.3);}
+.start-btn svg{width:16px;height:16px;}
+/* Annotation */
+.anno{position:absolute;left:-260px;top:50%;transform:translateY(-50%);background:linear-gradient(135deg,#4F46E5,#7C3AED);color:#fff;padding:10px 20px;border-radius:24px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(79,70,229,0.3);white-space:nowrap;z-index:10;}
+.anno::after{content:'';position:absolute;right:-8px;top:50%;transform:translateY(-50%);border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:8px solid #6d5ce7;}
+</style>
+</head><body>
+<div class="wrapper">
+  <div class="left">
+    <div class="left-nav">
+      <div class="logo">BOSS直聘</div>
+      <div style="flex:1;height:28px;background:#f1f3f4;border-radius:14px;display:flex;align-items:center;padding:0 12px;font-size:12px;color:#999;">🔍 搜索职位</div>
+    </div>
+    <div class="left-content">
+      <div class="fake-card">
+        <div class="title">高级前端开发工程师</div>
+        <div class="sub">字节跳动 · 北京朝阳区 · 25-50K</div>
+        <div style="margin-top:12px"><div class="fake-bar w80"></div><div class="fake-bar w60"></div><div class="fake-bar w40"></div></div>
+      </div>
+      <div class="fake-card">
+        <div class="title" style="font-size:14px">前端架构师</div>
+        <div class="sub">阿里巴巴 · 杭州 · 35-65K</div>
+        <div style="margin-top:12px"><div class="fake-bar w60"></div><div class="fake-bar w80"></div></div>
+      </div>
+      <div class="fake-card" style="opacity:0.5">
+        <div class="title" style="font-size:14px">资深前端工程师</div>
+        <div class="sub">美团 · 北京 · 30-55K</div>
+        <div style="margin-top:12px"><div class="fake-bar w80"></div><div class="fake-bar w40"></div></div>
+      </div>
+    </div>
+    <div class="anno">自动提取 JD 并智能分析</div>
+  </div>
+
+  <div class="right">
+    <div class="panel-header">
+      <div class="panel-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/></svg></div>
+      <div>
+        <div class="panel-title">AI 模拟面试</div>
+        <div class="panel-subtitle">InterviewAI Pro</div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="jd-status">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        已加载: 高级前端开发工程师
+      </div>
+
+      <div class="analysis-card">
+        <div class="section-title success">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          分析完成
+        </div>
+        <div class="analysis-body">
+          <div><strong>岗位：</strong>高级前端开发工程师</div>
+          <div><strong>级别：</strong>Senior / P6+</div>
+          <div style="margin-top:6px">
+            <strong>核心技能：</strong>
+            <div style="margin-top:4px">
+              <span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">Node.js</span><span class="tag">Webpack</span><span class="tag">性能优化</span><span class="tag">微前端</span>
+            </div>
+          </div>
+          <div style="margin-top:6px">
+            <strong>面试重点：</strong>
+            <div style="margin-top:4px">
+              <span class="tag">项目架构设计</span><span class="tag">复杂状态管理</span><span class="tag">性能调优经验</span><span class="tag">工程化实践</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="questions-section">
+        <div class="section-title primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          生成的面试题
+        </div>
+        <div class="q-list">
+          <div class="q-row"><span class="q-num">Q1</span><span class="q-type tech">技术</span><span class="q-text">请描述 React Fiber 架构的工作原理及性能优化实践</span></div>
+          <div class="q-row"><span class="q-num">Q2</span><span class="q-type tech">技术</span><span class="q-text">微前端架构中的样式隔离和 JS 沙箱方案</span></div>
+          <div class="q-row"><span class="q-num">Q3</span><span class="q-type proj">项目</span><span class="q-text">描述你主导的最复杂前端项目</span></div>
+          <div class="q-row"><span class="q-num">Q4</span><span class="q-type scene">场景</span><span class="q-text">大型 jQuery 项目迁移到 React + TS 的策略</span></div>
+          <div class="q-row"><span class="q-num">Q5</span><span class="q-type behav">行为</span><span class="q-text">技术方案与团队产生分歧时的处理方式</span></div>
+        </div>
+        <button class="start-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          开始模拟面试 (5题)
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

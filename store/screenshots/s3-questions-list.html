@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{width:1280px;height:800px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif;background:#f0f2f5;}
+.browser{width:1280px;height:800px;position:relative;}
+.tab-bar{height:36px;background:#dee1e6;display:flex;align-items:flex-end;padding:0 8px;gap:2px;}
+.tab{height:30px;padding:0 16px;background:#fff;border-radius:8px 8px 0 0;font-size:12px;color:#333;display:flex;align-items:center;gap:6px;}
+.tab.active{font-weight:500;}
+.tab .dot{width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,#4F46E5,#7C3AED);flex-shrink:0;}
+.addr-bar{height:40px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;padding:0 16px;}
+.addr-input{flex:1;height:28px;background:#f1f3f4;border-radius:14px;padding:0 12px;font-size:12px;color:#555;display:flex;align-items:center;}
+.page{height:724px;background:#f8fafc;display:flex;flex-direction:column;align-items:center;}
+/* Header */
+.header{width:100%;background:linear-gradient(135deg,#4F46E5,#7C3AED,#6366F1);background-size:300% 300%;padding:16px 24px;color:#fff;display:flex;align-items:center;gap:12px;}
+.header-logo{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;}
+.header-logo svg{width:20px;height:20px;}
+.header-title{font-size:17px;font-weight:700;}
+.header-sub{font-size:11px;opacity:0.7;}
+/* Content */
+.content{width:100%;max-width:780px;padding:28px 32px;display:flex;flex-direction:column;gap:18px;flex:1;}
+/* Analysis card */
+.analysis-card{padding:18px 20px;border-radius:12px;background:#ecfdf5;border:1px solid #a7f3d0;}
+.sec-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:10px;color:#059669;}
+.sec-title svg{width:15px;height:15px;}
+.analysis-body{font-size:13px;color:#475569;line-height:1.8;}
+.analysis-body strong{color:#065f46;}
+.tag{display:inline-block;padding:3px 10px;border-radius:5px;background:#d1fae5;color:#065f46;font-size:12px;margin:2px;font-weight:500;}
+/* Questions section */
+.q-section{flex:1;display:flex;flex-direction:column;}
+.q-section-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;color:#4F46E5;margin-bottom:12px;}
+.q-section-title svg{width:15px;height:15px;}
+.q-list{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;flex:1;}
+.q-row{display:flex;align-items:flex-start;gap:10px;padding:16px 18px;font-size:13px;line-height:1.6;}
+.q-row+.q-row{border-top:1px solid #e2e8f0;}
+.q-num{font-size:12px;color:#94a3b8;font-weight:600;flex-shrink:0;min-width:24px;}
+.q-type{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;flex-shrink:0;}
+.q-type.tech{background:#dbeafe;color:#1e40af;}
+.q-type.proj{background:#fef3c7;color:#92400e;}
+.q-type.scene{background:#e0e7ff;color:#3730a3;}
+.q-type.behav{background:#fce7f3;color:#9d174d;}
+.q-text{color:#1e293b;flex:1;}
+/* Start button */
+.start-btn{width:100%;padding:14px;border-radius:12px;border:none;color:#fff;font-size:15px;font-weight:600;background:linear-gradient(135deg,#4F46E5,#6366F1,#3730A3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;box-shadow:0 4px 16px rgba(79,70,229,0.3);}
+.start-btn svg{width:18px;height:18px;}
+</style>
+</head><body>
+<div class="browser">
+  <div class="tab-bar">
+    <div class="tab active"><div class="dot"></div>AI 模拟面试</div>
+    <div class="tab" style="opacity:0.4"><div class="dot" style="background:#aaa"></div>BOSS直聘</div>
+  </div>
+  <div class="addr-bar">
+    <div class="addr-input">🔒 chrome-extension://xxx/sidepanel.html?mode=tab</div>
+  </div>
+  <div class="page">
+    <div class="header">
+      <div class="header-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/></svg></div>
+      <div><div class="header-title">AI 模拟面试</div><div class="header-sub">InterviewAI Pro</div></div>
+    </div>
+    <div class="content">
+      <div class="analysis-card">
+        <div class="sec-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> 分析完成</div>
+        <div class="analysis-body">
+          <div><strong>岗位：</strong>高级前端开发工程师 &nbsp;&nbsp; <strong>级别：</strong>Senior / P6+</div>
+          <div style="margin-top:6px"><strong>核心技能：</strong>
+            <span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">Node.js</span><span class="tag">Webpack</span><span class="tag">性能优化</span><span class="tag">微前端</span>
+          </div>
+          <div style="margin-top:6px"><strong>面试重点：</strong>
+            <span class="tag">项目架构设计</span><span class="tag">复杂状态管理</span><span class="tag">性能调优经验</span><span class="tag">工程化实践</span>
+          </div>
+        </div>
+      </div>
+      <div class="q-section">
+        <div class="q-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 生成的面试题</div>
+        <div class="q-list">
+          <div class="q-row"><span class="q-num">Q1</span><span class="q-type tech">技术</span><span class="q-text">请详细描述 React 的 Fiber 架构工作原理，以及它如何解决大型应用中的渲染性能问题？请结合你在实际项目中的优化经验来说明。</span></div>
+          <div class="q-row"><span class="q-num">Q2</span><span class="q-type tech">技术</span><span class="q-text">在微前端架构中，如何解决不同子应用之间的样式隔离、JS 沙箱和通信问题？请分享你遇到的最大挑战及解决方案。</span></div>
+          <div class="q-row"><span class="q-num">Q3</span><span class="q-type proj">项目</span><span class="q-text">请描述一个你主导的最复杂的前端项目，包括技术选型、架构设计、团队协作和最终成果。你从中学到了什么？</span></div>
+          <div class="q-row"><span class="q-num">Q4</span><span class="q-type scene">场景</span><span class="q-text">假设你需要将一个现有的大型 jQuery 项目迁移到 React + TypeScript，请制定详细的迁移策略，包括如何保证业务连续性和渐进式重构。</span></div>
+          <div class="q-row"><span class="q-num">Q5</span><span class="q-type behav">行为</span><span class="q-text">请举一个你在技术方案上与团队产生分歧的例子，你是如何处理这种分歧的？最终结果如何？</span></div>
+        </div>
+        <button class="start-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          开始模拟面试 (5题)
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

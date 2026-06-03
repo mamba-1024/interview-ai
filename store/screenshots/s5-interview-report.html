@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{width:1280px;height:800px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif;background:#f0f2f5;}
+.browser{width:1280px;height:800px;}
+.tab-bar{height:36px;background:#dee1e6;display:flex;align-items:flex-end;padding:0 8px;gap:2px;}
+.tab{height:30px;padding:0 16px;background:#fff;border-radius:8px 8px 0 0;font-size:12px;color:#333;display:flex;align-items:center;gap:6px;}
+.tab.active{font-weight:500;}
+.tab .dot{width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,#4F46E5,#7C3AED);}
+.addr-bar{height:40px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;padding:0 16px;}
+.addr-input{flex:1;height:28px;background:#f1f3f4;border-radius:14px;padding:0 12px;font-size:12px;color:#555;display:flex;align-items:center;}
+.page{height:724px;background:#f8fafc;display:flex;flex-direction:column;align-items:center;}
+.header{width:100%;background:linear-gradient(135deg,#4F46E5,#7C3AED,#6366F1);padding:14px 24px;color:#fff;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.header-logo{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;}
+.header-logo svg{width:18px;height:18px;}
+.header-title{font-size:15px;font-weight:700;}
+.content{width:100%;max-width:780px;padding:24px 32px;flex:1;overflow:hidden;}
+/* Score header */
+.score-header{text-align:center;padding:28px 20px;background:linear-gradient(135deg,#eef2ff,#f0f9ff);border-radius:14px;margin-bottom:18px;}
+.score-icon{width:60px;height:60px;border-radius:16px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 8px 24px rgba(16,185,129,0.3);}
+.score-icon svg{width:28px;height:28px;color:#fff;}
+.score-label{font-size:14px;color:#475569;margin-bottom:4px;}
+.score-value{font-size:52px;font-weight:800;color:#10b981;line-height:1;}
+.score-meta{font-size:12px;color:#94a3b8;margin-top:10px;}
+/* Cards */
+.card{background:#fff;border-radius:12px;padding:18px 20px;margin-bottom:14px;border:1px solid #e2e8f0;}
+.card-title{font-weight:600;font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:6px;color:#1e293b;}
+.card-title svg{width:15px;height:15px;color:#4F46E5;}
+/* Score rows */
+.score-row{margin-bottom:10px;}
+.score-row:last-child{margin-bottom:0;}
+.score-lbl{display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;color:#475569;}
+.score-lbl strong{font-weight:600;}
+.sbar-bg{height:8px;border-radius:4px;background:#f1f5f9;overflow:hidden;}
+.sbar{height:100%;border-radius:4px;}
+/* Question detail */
+.q-item{padding:12px 0;border-bottom:1px solid #f1f5f9;}
+.q-item:last-child{border-bottom:none;}
+.q-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.q-title{font-weight:500;font-size:13px;color:#1e293b;}
+.q-score{font-weight:700;font-size:15px;}
+.q-desc{font-size:12px;color:#94a3b8;line-height:1.5;}
+.q-fb{font-size:12px;margin-top:4px;display:flex;align-items:center;gap:4px;color:#059669;}
+.q-fb svg{width:11px;height:11px;}
+/* Tip card */
+.tip-card{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:18px 20px;margin-bottom:14px;}
+.tip-title{font-weight:600;font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:6px;color:#92400e;}
+.tip-title svg{width:15px;height:15px;color:#d97706;}
+.tip-body{font-size:13px;color:#475569;line-height:1.7;}
+/* Actions */
+.actions{display:flex;gap:12px;margin-top:4px;}
+.btn-outline{flex:1;padding:14px;border-radius:10px;border:1.5px solid #e2e8f0;background:#fff;color:#475569;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-outline svg{width:15px;height:15px;}
+.btn-accent{flex:1;padding:14px;border-radius:10px;border:none;color:#fff;font-size:14px;font-weight:600;background:linear-gradient(135deg,#f59e0b,#fbbf24,#d97706);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(245,158,11,0.3);}
+.btn-accent svg{width:15px;height:15px;}
+</style>
+</head><body>
+<div class="browser">
+  <div class="tab-bar">
+    <div class="tab active"><div class="dot"></div>AI 模拟面试 - 面试报告</div>
+  </div>
+  <div class="addr-bar"><div class="addr-input">🔒 chrome-extension://xxx/sidepanel.html?mode=tab</div></div>
+  <div class="page">
+    <div class="header">
+      <div class="header-logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/></svg></div>
+      <div><div class="header-title">AI 模拟面试</div></div>
+    </div>
+    <div class="content">
+      <div class="score-header">
+        <div class="score-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+        <div class="score-label">综合评分</div>
+        <div class="score-value">83</div>
+        <div class="score-meta">面试时长 12:35 · 完成 5 道题目</div>
+      </div>
+      <div style="display:flex;gap:14px;">
+        <div class="card" style="flex:1;">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> 各维度得分</div>
+          <div class="score-row">
+            <div class="score-lbl"><span>内容深度</span><strong style="color:#4F46E5">80</strong></div>
+            <div class="sbar-bg"><div class="sbar" style="width:80%;background:#4F46E5"></div></div>
+          </div>
+          <div class="score-row">
+            <div class="score-lbl"><span>逻辑清晰度</span><strong style="color:#8B5CF6">86</strong></div>
+            <div class="sbar-bg"><div class="sbar" style="width:86%;background:#8B5CF6"></div></div>
+          </div>
+          <div class="score-row">
+            <div class="score-lbl"><span>表达流畅度</span><strong style="color:#06B6D4">82</strong></div>
+            <div class="sbar-bg"><div class="sbar" style="width:82%;background:#06B6D4"></div></div>
+          </div>
+        </div>
+        <div class="card" style="flex:1.4;">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 题目详情</div>
+          <div class="q-item">
+            <div class="q-head"><span class="q-title">Q1: 技术 - React Fiber 架构</span><span class="q-score" style="color:#10b981">85分</span></div>
+            <div class="q-fb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 4 12 14.01 9 11.01"/></svg> 对 Fiber 架构理解深入，结合了实际优化经验</div>
+          </div>
+          <div class="q-item">
+            <div class="q-head"><span class="q-title">Q2: 技术 - 微前端架构</span><span class="q-score" style="color:#10b981">82分</span></div>
+            <div class="q-fb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 4 12 14.01 9 11.01"/></svg> 方案全面，有实际项目经验支撑</div>
+          </div>
+          <div class="q-item">
+            <div class="q-head"><span class="q-title">Q3: 项目 - 复杂前端项目</span><span class="q-score" style="color:#10b981">88分</span></div>
+            <div class="q-fb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 4 12 14.01 9 11.01"/></svg> 项目描述清晰，体现了领导力和技术深度</div>
+          </div>
+        </div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> 面试官总结</div>
+        <div class="tip-body">候选人具备扎实的前端技术功底，对 React 生态和微前端架构有深入理解。项目经验丰富，能够清晰地描述复杂技术方案。建议在回答中多补充具体的性能数据和踩坑经验，提升回答的说服力。</div>
+        <div style="margin-top:8px;font-size:13px;color:#4F46E5;font-weight:500;">继续保持，你的技术广度和项目经验是明显的竞争优势！</div>
+      </div>
+      <div class="actions">
+        <button class="btn-outline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> 重新面试</button>
+        <button class="btn-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> 导出报告</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

@@ -18,6 +18,11 @@
     "https://www.liepin.com/*",
     "https://www.liepin.com/zhaopin/*",
     "https://www.nowcoder.com/*",
+    "https://*.indeed.com/*",
+    "https://www.glassdoor.com/*",
+    "https://wellfound.com/*",
+    "https://www.dice.com/*",
+    "https://www.monster.com/*",
     "https://dashscope.aliyuncs.com/*",
     "https://api.openai.com/*",
     "https://api.deepseek.com/*"
@@ -35,7 +40,12 @@
         "https://www.zhaopin.com/*",
         "https://www.51job.com/*",
         "https://www.liepin.com/*",
-        "https://www.nowcoder.com/*"
+        "https://www.nowcoder.com/*",
+        "https://*.indeed.com/*",
+        "https://www.glassdoor.com/*",
+        "https://wellfound.com/*",
+        "https://www.dice.com/*",
+        "https://www.monster.com/*"
       ],
       "js": ["content.js"],
       "css": ["content.css"],

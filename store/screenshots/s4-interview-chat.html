@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{width:1280px;height:800px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif;background:#f0f2f5;}
+.browser{width:1280px;height:800px;position:relative;}
+.tab-bar{height:36px;background:#dee1e6;display:flex;align-items:flex-end;padding:0 8px;gap:2px;}
+.tab{height:30px;padding:0 16px;background:#fff;border-radius:8px 8px 0 0;font-size:12px;color:#333;display:flex;align-items:center;gap:6px;}
+.tab.active{font-weight:500;}
+.tab .dot{width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,#4F46E5,#7C3AED);}
+.addr-bar{height:40px;background:#fff;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;padding:0 16px;}
+.addr-input{flex:1;height:28px;background:#f1f3f4;border-radius:14px;padding:0 12px;font-size:12px;color:#555;display:flex;align-items:center;}
+.page{height:724px;background:#f8fafc;display:flex;flex-direction:column;}
+/* Header */
+.header{background:linear-gradient(135deg,#4F46E5,#7C3AED,#6366F1);padding:14px 24px;color:#fff;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.header-left{display:flex;align-items:center;gap:10px;}
+.header-logo{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;}
+.header-logo svg{width:18px;height:18px;}
+.header-title{font-size:15px;font-weight:700;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.timer-badge{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;background:rgba(255,255,255,0.15);font-size:12px;}
+.timer-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;}
+.timer-text{font-family:'SF Mono',monospace;font-weight:500;}
+/* Progress */
+.progress{height:3px;background:#f1f5f9;flex-shrink:0;}
+.progress-bar{height:100%;width:46%;background:linear-gradient(90deg,#4F46E5,#818CF8,#A78BFA);}
+/* Chat area */
+.chat{flex:1;overflow:hidden;padding:24px 32px;display:flex;flex-direction:column;gap:18px;max-width:800px;margin:0 auto;width:100%;}
+/* Messages */
+.msg{display:flex;gap:10px;max-width:88%;}
+.msg-bot{align-self:flex-start;}
+.msg-user{align-self:flex-end;flex-direction:row-reverse;}
+.avatar{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.avatar-bot{background:linear-gradient(135deg,#4F46E5,#3730A3);}
+.avatar-bot svg{width:16px;height:16px;color:#fff;}
+.avatar-user{background:#e0e7ff;}
+.avatar-user svg{width:16px;height:16px;color:#4F46E5;}
+.bubble{padding:12px 16px;border-radius:4px 14px 14px 14px;font-size:13px;line-height:1.7;}
+.bubble-bot{background:#fff;border:1px solid #e2e8f0;color:#1e293b;}
+.bubble-user{background:#eef2ff;border-radius:14px 4px 14px 14px;color:#1e293b;}
+.q-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:500;margin-bottom:8px;}
+.q-badge.tech{background:#dbeafe;color:#1e40af;}
+.q-badge-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+/* Score badge inline */
+.score-inline{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;background:#fffbeb;font-size:11px;margin-left:40px;margin-top:4px;color:#d97706;font-weight:600;}
+.score-inline svg{width:12px;height:12px;}
+/* Feedback card */
+.feedback{margin-left:42px;border-radius:12px;border:1px solid #e2e8f0;background:#fff;overflow:hidden;max-width:520px;}
+.fb-header{background:linear-gradient(135deg,#eef2ff,#ede9fe,#f0f9ff);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
+.fb-title{font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px;color:#1e293b;}
+.fb-title svg{width:15px;height:15px;}
+.fb-score{padding:4px 12px;border-radius:8px;color:#fff;font-weight:700;font-size:18px;background:#10b981;}
+.fb-scores{padding:14px 16px;}
+.score-row{margin-bottom:10px;}
+.score-row:last-child{margin-bottom:0;}
+.score-label{display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;color:#475569;}
+.score-label strong{font-weight:600;}
+.score-bar-bg{height:7px;border-radius:4px;background:#f1f5f9;overflow:hidden;}
+.score-bar{height:100%;border-radius:4px;}
+.fb-items{padding:0 16px 14px;}
+.fb-item{display:flex;gap:6px;align-items:flex-start;margin-bottom:6px;font-size:12px;line-height:1.5;}
+.fb-item.positive{color:#059669;}
+.fb-item.negative{color:#d97706;}
+.fb-item svg{width:13px;height:13px;flex-shrink:0;margin-top:2px;}
+/* Input area */
+.input-area{padding:14px 24px;border-top:1px solid #e2e8f0;background:#fff;flex-shrink:0;display:flex;justify-content:center;}
+.input-inner{max-width:800px;width:100%;display:flex;gap:10px;}
+.input-box{flex:1;border:1.5px solid #e2e8f0;border-radius:10px;padding:12px 14px;font-size:13px;color:#94a3b8;background:#fff;line-height:1.5;}
+.send-btn{width:44px;height:44px;border-radius:10px;background:#4F46E5;color:#fff;border:none;display:flex;align-items:center;justify-content:center;align-self:flex-end;flex-shrink:0;}
+.send-btn svg{width:18px;height:18px;}
+</style>
+</head><body>
+<div class="browser">
+  <div class="tab-bar">
+    <div class="tab active"><div class="dot"></div>AI 模拟面试</div>
+  </div>
+  <div class="addr-bar"><div class="addr-input">🔒 chrome-extension://xxx/sidepanel.html?mode=tab</div></div>
+  <div class="page">
+    <div class="header">
+      <div class="header-left">
+        <div class="header-logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/></svg></div>
+        <div><div class="header-title">AI 模拟面试</div></div>
+      </div>
+      <div class="header-right">
+        <div class="timer-badge"><div class="timer-dot"></div><span class="timer-text">03:42</span></div>
+      </div>
+    </div>
+    <div class="progress"><div class="progress-bar"></div></div>
+    <div class="chat">
+      <!-- Q1 history -->
+      <div>
+        <div class="msg msg-bot">
+          <div class="avatar avatar-bot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/></svg></div>
+          <div>
+            <div class="q-badge tech"><div class="q-badge-dot"></div>技术</div>
+            <div class="bubble bubble-bot">请详细描述 React 的 Fiber 架构工作原理，以及它如何解决大型应用中的渲染性能问题？</div>
+          </div>
+        </div>
+        <div class="msg msg-user" style="margin-top:10px">
+          <div class="avatar avatar-user"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="bubble bubble-user">Fiber 是 React 16 引入的新协调引擎，将递归更新改为可中断的增量更新。每个 Fiber 节点对应一个组件，通过链表结构实现优先级调度和时间切片...</div>
+        </div>
+        <div class="score-inline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> 85分</div>
+      </div>
+
+      <!-- Q2 current -->
+      <div>
+        <div class="msg msg-bot">
+          <div class="avatar avatar-bot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/></svg></div>
+          <div>
+            <div class="q-badge tech"><div class="q-badge-dot"></div>技术</div>
+            <div class="bubble bubble-bot">在微前端架构中，如何解决不同子应用之间的样式隔离、JS 沙箱和通信问题？请分享你遇到的最大挑战及解决方案。</div>
+          </div>
+        </div>
+        <div class="msg msg-user" style="margin-top:10px">
+          <div class="avatar avatar-user"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="bubble bubble-user">我们团队使用 qiankun 框架，通过 Shadow DOM 实现样式隔离，Proxy 实现 JS 沙箱。通信方面基于全局状态管理和自定义事件机制，最大挑战是第三方库的全局变量污染问题...</div>
+        </div>
+      </div>
+
+      <!-- Feedback card for Q2 -->
+      <div class="feedback">
+        <div class="fb-header">
+          <span class="fb-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> 回答评分</span>
+          <div class="fb-score">82</div>
+        </div>
+        <div class="fb-scores">
+          <div class="score-row">
+            <div class="score-label"><span>内容深度</span><strong style="color:#4F46E5">80</strong></div>
+            <div class="score-bar-bg"><div class="score-bar" style="width:80%;background:#4F46E5"></div></div>
+          </div>
+          <div class="score-row">
+            <div class="score-label"><span>逻辑清晰度</span><strong style="color:#8B5CF6">85</strong></div>
+            <div class="score-bar-bg"><div class="score-bar" style="width:85%;background:#8B5CF6"></div></div>
+          </div>
+          <div class="score-row">
+            <div class="score-label"><span>表达流畅度</span><strong style="color:#06B6D4">78</strong></div>
+            <div class="score-bar-bg"><div class="score-bar" style="width:78%;background:#06B6D4"></div></div>
+          </div>
+        </div>
+        <div class="fb-items">
+          <div class="fb-item positive"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>提到了 qiankun 框架的实际应用经验，有具体方案</span></div>
+          <div class="fb-item positive"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>覆盖了样式隔离、JS 沙箱和通信三个核心问题</span></div>
+          <div class="fb-item negative"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg><span>可以补充 Proxy 沙箱的具体实现细节和遇到的坑</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-inner">
+        <button style="width:100%;padding:14px;border-radius:10px;border:none;color:#fff;font-size:14px;font-weight:600;background:linear-gradient(135deg,#4F46E5,#6366F1);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(79,70,229,0.3);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          继续追问
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

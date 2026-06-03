@@ -175,6 +175,254 @@ const JDParsers = {
       };
     },
   },
+
+  /**
+   * Indeed — 全球最大招聘搜索引擎
+   * 支持各地区子域名 (us.indeed.com, uk.indeed.com, jp.indeed.com 等)
+   */
+  indeed: {
+    match: (url) => url.includes('indeed.com'),
+    extract: () => {
+      const result = { title: '', company: '', salary: '', jd: '', location: '' };
+
+      // 职位标题
+      const titleEl =
+        document.querySelector('.jobsearch-JobInfoPane-title, .jobsearch-JobInfoPane-subtitle h1') ||
+        document.querySelector('[class*="jobsearch-JobInfoPane"] h1') ||
+        document.querySelector('h1.jobsearch-JobInfoPane-title');
+      result.title = titleEl?.textContent?.trim() || '';
+
+      // 公司名
+      const companyEl =
+        document.querySelector('[data-company-name]') ||
+        document.querySelector('.jobsearch-InlineCompanyRating div:first-child') ||
+        document.querySelector('[class*="company"] a');
+      result.company = companyEl?.textContent?.trim() || '';
+
+      // 地点
+      const locationEl =
+        document.querySelector('[class*="jobsearch-JobInfoPane-subtitle"] div:last-child') ||
+        document.querySelector('.jobsearch-JobInfoPane-subtitle > div:nth-child(2)');
+      result.location = locationEl?.textContent?.trim() || '';
+
+      // 薪资
+      const salaryEl =
+        document.querySelector('.jobsearch-JobMetadataHeader-item') ||
+        document.querySelector('[class*="salary"]');
+      result.salary = salaryEl?.textContent?.trim() || '';
+
+      // JD 正文
+      const jdEl =
+        document.querySelector('#jobDescriptionText, .jobsearch-jobDescriptionText') ||
+        document.querySelector('[class*="jobDescriptionText"]');
+      result.jd = jdEl?.textContent?.trim() || '';
+
+      return {
+        ...result,
+        fullText: buildFullText(result.title, result.company, result.salary, result.location, result.jd, [], []),
+      };
+    },
+  },
+
+  /**
+   * Glassdoor — 公司评价 + 招聘
+   */
+  glassdoor: {
+    match: (url) => url.includes('glassdoor.com'),
+    extract: () => {
+      const result = { title: '', company: '', salary: '', jd: '', location: '' };
+
+      // 职位标题
+      const titleEl =
+        document.querySelector('[class*="jobViewHeader"] h1') ||
+        document.querySelector('.JobDetails_jobDetails__title') ||
+        document.querySelector('[class*="job-title"]') ||
+        document.querySelector('h1');
+      result.title = titleEl?.textContent?.trim() || '';
+
+      // 公司名
+      const companyEl =
+        document.querySelector('[class*="jobViewHeader"] [class*="employer"]') ||
+        document.querySelector('.EmployerProfile_compactEmployerName') ||
+        document.querySelector('[class*="employer-name"]');
+      result.company = companyEl?.textContent?.trim() || '';
+
+      // 地点
+      const locationEl =
+        document.querySelector('[class*="jobViewHeader"] [class*="location"]') ||
+        document.querySelector('[class*="location"]');
+      result.location = locationEl?.textContent?.trim() || '';
+
+      // 薪资
+      const salaryEl =
+        document.querySelector('[class*="salary"]') ||
+        document.querySelector('[class*="Salary"]');
+      result.salary = salaryEl?.textContent?.trim() || '';
+
+      // JD 正文
+      const jdEl =
+        document.querySelector('[class*="JobDetails"] [class*="desc"]') ||
+        document.querySelector('.JobDetails_jobDescription__content') ||
+        document.querySelector('[class*="jobDescription"]');
+      result.jd = jdEl?.textContent?.trim() || '';
+
+      return {
+        ...result,
+        fullText: buildFullText(result.title, result.company, result.salary, result.location, result.jd, [], []),
+      };
+    },
+  },
+
+  /**
+   * Wellfound (原 AngelList) — 创业公司 / 科技岗位
+   */
+  wellfound: {
+    match: (url) => url.includes('wellfound.com') || url.includes('angel.co'),
+    extract: () => {
+      const result = { title: '', company: '', salary: '', jd: '', location: '' };
+
+      // 职位标题
+      const titleEl =
+        document.querySelector('[class*="job-title"]') ||
+        document.querySelector('h1') ||
+        document.querySelector('[class*="listing-title"]');
+      result.title = titleEl?.textContent?.trim() || '';
+
+      // 公司名
+      const companyEl =
+        document.querySelector('[class*="company-name"]') ||
+        document.querySelector('[class*="startup-name"]') ||
+        document.querySelector('a[class*="company"]');
+      result.company = companyEl?.textContent?.trim() || '';
+
+      // 地点
+      const locationEl =
+        document.querySelector('[class*="location"]') ||
+        document.querySelector('[class*="city"]');
+      result.location = locationEl?.textContent?.trim() || '';
+
+      // 薪资
+      const salaryEl =
+        document.querySelector('[class*="salary"]') ||
+        document.querySelector('[class*="compensation"]');
+      result.salary = salaryEl?.textContent?.trim() || '';
+
+      // JD 正文
+      const jdEl =
+        document.querySelector('[class*="job-description"]') ||
+        document.querySelector('[class*="listing-description"]') ||
+        document.querySelector('[class*="description"]');
+      result.jd = jdEl?.textContent?.trim() || '';
+
+      // 技能标签
+      const tagEls = document.querySelectorAll('[class*="skill"] span, [class*="tag"] span');
+      const tags = Array.from(tagEls).map(el => el.textContent.trim()).filter(Boolean);
+
+      return {
+        ...result, tags,
+        fullText: buildFullText(result.title, result.company, result.salary, result.location, result.jd, tags, []),
+      };
+    },
+  },
+
+  /**
+   * Dice — 技术 / IT 岗位
+   */
+  dice: {
+    match: (url) => url.includes('dice.com'),
+    extract: () => {
+      const result = { title: '', company: '', salary: '', jd: '', location: '' };
+
+      // 职位标题
+      const titleEl =
+        document.querySelector('[data-cy="jobTitle"]') ||
+        document.querySelector('h1[class*="title"]') ||
+        document.querySelector('[class*="job-title"]') ||
+        document.querySelector('h1');
+      result.title = titleEl?.textContent?.trim() || '';
+
+      // 公司名
+      const companyEl =
+        document.querySelector('[data-cy="employerName"]') ||
+        document.querySelector('[class*="company-name"]') ||
+        document.querySelector('[class*="employer"]');
+      result.company = companyEl?.textContent?.trim() || '';
+
+      // 地点
+      const locationEl =
+        document.querySelector('[data-cy="jobLocation"]') ||
+        document.querySelector('[class*="location"]');
+      result.location = locationEl?.textContent?.trim() || '';
+
+      // 薪资
+      const salaryEl =
+        document.querySelector('[data-cy="jobSalary"]') ||
+        document.querySelector('[class*="salary"]');
+      result.salary = salaryEl?.textContent?.trim() || '';
+
+      // JD 正文
+      const jdEl =
+        document.querySelector('[data-cy="jobDescription"]') ||
+        document.querySelector('[class*="job-description"]') ||
+        document.querySelector('[class*="jobDetail"]');
+      result.jd = jdEl?.textContent?.trim() || '';
+
+      // 技能标签
+      const tagEls = document.querySelectorAll('[data-cy="skills"] span, [class*="skill-tag"]');
+      const tags = Array.from(tagEls).map(el => el.textContent.trim()).filter(Boolean);
+
+      return {
+        ...result, tags,
+        fullText: buildFullText(result.title, result.company, result.salary, result.location, result.jd, tags, []),
+      };
+    },
+  },
+
+  /**
+   * Monster — 全球经典招聘网站
+   */
+  monster: {
+    match: (url) => url.includes('monster.com'),
+    extract: () => {
+      const result = { title: '', company: '', salary: '', jd: '', location: '' };
+
+      // 职位标题
+      const titleEl =
+        document.querySelector('[class*="header__title"]') ||
+        document.querySelector('h1[class*="title"]') ||
+        document.querySelector('h1');
+      result.title = titleEl?.textContent?.trim() || '';
+
+      // 公司名
+      const companyEl =
+        document.querySelector('[class*="header__company"]') ||
+        document.querySelector('[class*="company-name"]') ||
+        document.querySelector('[class*="employer"]');
+      result.company = companyEl?.textContent?.trim() || '';
+
+      // 地点
+      const locationEl =
+        document.querySelector('[class*="header__location"]') ||
+        document.querySelector('[class*="location"]');
+      result.location = locationEl?.textContent?.trim() || '';
+
+      // 薪资
+      const salaryEl = document.querySelector('[class*="salary"]');
+      result.salary = salaryEl?.textContent?.trim() || '';
+
+      // JD 正文
+      const jdEl =
+        document.querySelector('[class*="job-description"]') ||
+        document.querySelector('#JobDescription') ||
+        document.querySelector('[class*="jobDetail"]');
+      result.jd = jdEl?.textContent?.trim() || '';
+
+      return {
+        ...result,
+        fullText: buildFullText(result.title, result.company, result.salary, result.location, result.jd, [], []),
+      };
+    },
+  },
 };
 
 // ============================================================
