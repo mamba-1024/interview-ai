@@ -94,26 +94,27 @@ class SpeechService {
     };
 
     recognition.onerror = (event) => {
-      console.warn('[SpeechService] Recognition error:', event.error, event.message);
       this.isListening = false;
 
-      // not-allowed 表示麦克风权限被拒绝
-      if (event.error === 'not-allowed') {
-        this._shouldRestart = false;
-        if (callbacks.onError) callbacks.onError('not-allowed', '麦克风权限被拒绝，请在浏览器地址栏左侧点击锁图标允许麦克风访问');
-        return;
-      }
-
-      // no-speech 是正常情况（用户没有说话），不需要报错
-      if (event.error === 'no-speech') {
-        return;
-      }
-
-      // aborted 通常是因为我们主动 stop()，不需要重启
+      // aborted 通常是因为我们主动 stop()，静默处理
       if (event.error === 'aborted') {
         return;
       }
 
+      // no-speech 是正常情况（用户没有说话），静默处理
+      if (event.error === 'no-speech') {
+        return;
+      }
+
+      // not-allowed 表示麦克风权限被拒绝
+      if (event.error === 'not-allowed') {
+        this._shouldRestart = false;
+        console.warn('[SpeechService] Recognition error: not-allowed');
+        if (callbacks.onError) callbacks.onError('not-allowed', '麦克风权限被拒绝，请在浏览器地址栏左侧点击锁图标允许麦克风访问');
+        return;
+      }
+
+      console.warn('[SpeechService] Recognition error:', event.error, event.message || '');
       if (callbacks.onError) callbacks.onError(event.error, event.message);
     };
 
@@ -185,8 +186,15 @@ class SpeechService {
     utterance.onerror = (e) => {
       this.isSpeaking = false;
       this.currentUtterance = null;
-      console.warn('[SpeechService] TTS error:', e);
-      if (callbacks.onError) callbacks.onError(e);
+
+      // interrupted / canceled 是主动 stopSpeaking() 触发的，静默处理
+      const errType = e?.error || 'unknown';
+      if (errType === 'interrupted' || errType === 'canceled' || errType === 'audio-busy') {
+        return;
+      }
+
+      console.warn('[SpeechService] TTS error:', errType, e?.message || '');
+      if (callbacks.onError) callbacks.onError(errType);
     };
 
     this.currentUtterance = utterance;
