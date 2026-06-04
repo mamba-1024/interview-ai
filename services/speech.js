@@ -15,6 +15,16 @@ class SpeechService {
     this.lang = 'zh-CN';
     this._callbacks = {};
     this._shouldRestart = false;
+    // 面试官性别：'male' | 'female'，影响 TTS 语音选择
+    this.gender = 'female';
+  }
+
+  /**
+   * 设置面试官性别（影响语音合成的音调和语音选择）
+   * @param {'male' | 'female'} gender
+   */
+  setGender(gender) {
+    this.gender = gender === 'male' ? 'male' : 'female';
   }
 
   /**
@@ -164,13 +174,23 @@ class SpeechService {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = this.lang;
     utterance.rate = 1.0;
-    utterance.pitch = 1.0;
     utterance.volume = 1.0;
 
-    // 尝试选择中文语音
+    // 根据性别调整音调和语音
     const voices = this.synth.getVoices();
-    const zhVoice = voices.find(v => v.lang.startsWith('zh')) || voices[0];
-    if (zhVoice) utterance.voice = zhVoice;
+    const zhVoices = voices.filter(v => v.lang.startsWith('zh'));
+
+    if (this.gender === 'male') {
+      utterance.pitch = 0.8;
+      // 优先选名称中含 male/男 的中文语音，否则取第一个
+      const maleVoice = zhVoices.find(v => /male|男/i.test(v.name));
+      utterance.voice = maleVoice || zhVoices[0] || voices[0];
+    } else {
+      utterance.pitch = 1.2;
+      // 优先选名称中含 female/女 的中文语音，否则取第一个
+      const femaleVoice = zhVoices.find(v => /female|女/i.test(v.name));
+      utterance.voice = femaleVoice || zhVoices[0] || voices[0];
+    }
 
     utterance.onstart = () => {
       this.isSpeaking = true;

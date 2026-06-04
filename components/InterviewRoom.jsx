@@ -10,6 +10,8 @@ import { SpeechService } from '../services/speech.js';
 
 const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit }) => {
   // 状态
+  // 随机选择面试官性别（每次进入面试间决定一次）
+  const [gender] = useState(() => Math.random() > 0.5 ? 'male' : 'female');
   const [currentIdx, setCurrentIdx] = useState(0);
   const [phase, setPhase] = useState('intro'); // intro | asking | listening | scoring | done
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -50,8 +52,9 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
   // 检查 STT 支持
   const sttSupported = SpeechService.isSupported().stt;
 
-  // 初始化摄像头
+  // 初始化摄像头 + 设置语音性别
   useEffect(() => {
+    speechService.setGender(gender);
     startCamera();
     return () => {
       stopCamera();
@@ -513,7 +516,7 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
         {/* 左：AI 面试官 */}
         <div className="ir-video-cell">
           <div className="ir-video-inner">
-            <InterviewAvatar isSpeaking={isSpeaking} size={220} />
+            <InterviewAvatar isSpeaking={isSpeaking} size={220} gender={gender} />
           </div>
           <div className="ir-video-label">
             <span className={`ir-video-dot ${isSpeaking ? 'ir-video-dot--active' : ''}`} />
