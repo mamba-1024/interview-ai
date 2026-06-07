@@ -33,6 +33,8 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
   const [activeTab, setActiveTab] = useState(0);
   const [retryRef, setRetryRef] = useState(null); // { questionIdx, answer, evaluation }
   const [showDoneBanner, setShowDoneBanner] = useState(false);
+  const [sttProcessing, setSttProcessing] = useState(false); // 异步 STT 处理中
+  const [sttEngine, setSttEngine] = useState('web');
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -45,16 +47,38 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
   const micStreamRef = useRef(null); // 麦克风检测音频流
   const micAnalyserRef = useRef(null); // 音频分析器
   const micAnimRef = useRef(null); // requestAnimationFrame ID
+  const micAudioCtxRef = useRef(null); // 麦克风检测 AudioContext
+  const awaitingTranscriptionRef = useRef(false); // 用户主动结束作答，等待异步转写
+  const micOnRef = useRef(true);
 
   const currentQuestion = questions[currentIdx];
   const totalQuestions = questions.length;
 
-  // 检查 STT 支持
-  const sttSupported = SpeechService.isSupported().stt;
+  const sttSupported = SpeechService.isEngineSupported(sttEngine);
 
-  // 初始化摄像头 + 设置语音性别
+  // 初始化摄像头 + 设置语音性别 + 加载 STT 配置
   useEffect(() => {
     speechService.setGender(gender);
+
+    // 加载 STT 引擎配置
+    (async () => {
+      try {
+        const resp = await new Promise((resolve) => {
+          chrome.runtime.sendMessage({ action: 'getConfig' }, (r) => resolve(r));
+        });
+        const cfg = resp?.config || {};
+        if (cfg.sttEngine) {
+          speechService.setSttEngine(cfg.sttEngine);
+          setSttEngine(speechService.sttEngine);
+        }
+        if (cfg.deepgramApiKey) speechService.setDeepgramApiKey(cfg.deepgramApiKey);
+        if (cfg.iflytekAppId) speechService.setIflytekConfig(cfg.iflytekAppId, cfg.iflytekApiKey, cfg.iflytekApiSecret);
+        console.log('[InterviewRoom] STT engine:', speechService.sttEngine);
+      } catch (e) {
+        console.warn('[InterviewRoom] Failed to load STT config:', e);
+      }
+    })();
+
     startCamera();
     return () => {
       stopCamera();
@@ -120,15 +144,41 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
   };
 
   // 结束回答（防止重复触发 evaluateAnswer）
+  const resumeMicDetectIfNeeded = useCallback(() => {
+    if (micOnRef.current) startMicDetect();
+  }, []);
+
+  const pauseMicDetectForStt = useCallback(() => {
+    stopMicDetect();
+  }, []);
+
   const finishAnswer = useCallback(() => {
     if (isEvaluatingRef.current) return;
     isEvaluatingRef.current = true;
+    awaitingTranscriptionRef.current = false;
     speechService.stopListening();
     setAudioActive(false);
+    setSttProcessing(false);
+    resumeMicDetectIfNeeded();
     setPhase('scoring');
-    // 通过 ref 调用最新的 evaluateAnswer，避免闭包陈旧
     evaluateAnswerRef.current && evaluateAnswerRef.current();
-  }, []);
+  }, [resumeMicDetectIfNeeded]);
+
+  // 用户点击“结束作答”按钮的处理
+  const handleStopAnswer = useCallback(() => {
+    const engine = speechService.sttEngine;
+    const isAsyncEngine = engine === 'deepgram' || engine === 'iflytek';
+
+    if (isAsyncEngine && (speechService.isAsyncProcessing || speechService.isListening)) {
+      awaitingTranscriptionRef.current = true;
+      speechService.stopListening();
+      setAudioActive(false);
+      setSttProcessing(true);
+      return;
+    }
+
+    finishAnswer();
+  }, [finishAnswer]);
 
   // 停止麦克风检测
   const stopMicDetect = () => {
@@ -140,6 +190,10 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
       micStreamRef.current.getTracks().forEach(t => t.stop());
       micStreamRef.current = null;
     }
+    if (micAudioCtxRef.current && micAudioCtxRef.current.state !== 'closed') {
+      micAudioCtxRef.current.close().catch(() => {});
+    }
+    micAudioCtxRef.current = null;
     micAnalyserRef.current = null;
     setMicLevel(0);
   };
@@ -158,6 +212,7 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
       // Web Audio 分析音量
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       const audioCtx = new AudioCtx();
+      micAudioCtxRef.current = audioCtx;
       const source = audioCtx.createMediaStreamSource(stream);
       const analyser = audioCtx.createAnalyser();
       analyser.fftSize = 256;
@@ -184,12 +239,12 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
 
   const toggleMic = () => {
     if (micOn) {
-      // 关闭麦克风
       stopMicDetect();
       setMicOn(false);
+      micOnRef.current = false;
     } else {
-      // 打开麦克风并检测
       setMicOn(true);
+      micOnRef.current = true;
       startMicDetect();
     }
   };
@@ -214,30 +269,41 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
     setSttError(null);
     transcriptRef.current = '';
 
-    // TTS 朗读，读完后直接开始聆听（不加 setTimeout）
+    // TTS 朗读，读完后直接开始聆听
     speechService.speak(q.question, {
       onStart: () => setIsSpeaking(true),
       onEnd: () => {
         setIsSpeaking(false);
-        startListening();
+        startListeningRef.current();
       },
       onError: () => {
-        // TTS 出错也直接进入聆听
         setIsSpeaking(false);
-        startListening();
+        startListeningRef.current();
       },
     });
   }, [questions]);
 
+  const startListeningRef = useRef(() => {});
+
   // 开始语音识别
   const startListening = () => {
+    if (!sttSupported) {
+      setSttError('当前环境不支持所选语音识别引擎，请使用文字输入或在设置中切换引擎');
+      setPhase('listening');
+      return;
+    }
+
+    pauseMicDetectForStt();
+    awaitingTranscriptionRef.current = false;
+
     setPhase('listening');
     setTranscript('');
     setInterimText('');
     setSttError(null);
     setAudioActive(false);
+    setSttProcessing(false);
     transcriptRef.current = '';
-    questionStartMarkRef.current = elapsedTime; // 记录开始作答时间
+    questionStartMarkRef.current = elapsedTime;
 
     speechService.startListening({
       onStart: () => {
@@ -248,35 +314,62 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
         console.log('[InterviewRoom] Audio capturing');
       },
       onResult: (text) => {
+        if (speechService.sttEngine === 'iflytek' || speechService.sttEngine === 'deepgram') {
+          setSttProcessing(false);
+          return;
+        }
         transcriptRef.current += (transcriptRef.current ? ' ' : '') + text;
         setTranscript(transcriptRef.current);
+        setSttProcessing(false);
       },
       onInterim: (text) => {
         setInterimText(text);
-      },
-      onEnd: () => {
-        setAudioActive(false);
-        // 有内容则自动进入评分
-        if (transcriptRef.current.trim().length > 0) {
-          finishAnswer();
+        if (speechService.sttEngine === 'iflytek' || speechService.sttEngine === 'deepgram') {
+          transcriptRef.current = text;
+          setTranscript(text);
         }
+      },
+      onEnd: (meta = {}) => {
+        setAudioActive(false);
+        setSttProcessing(false);
+        resumeMicDetectIfNeeded();
+
+        // 仅在用户主动点击「结束作答」后，才由 onEnd 触发评分
+        if (!awaitingTranscriptionRef.current) return;
+
+        awaitingTranscriptionRef.current = false;
+
+        if (meta.empty || meta.reason === 'too-short') {
+          isEvaluatingRef.current = false;
+          setSttError('录音时间太短或未检测到语音，请继续作答或使用下方文字输入');
+          return;
+        }
+
+        finishAnswer();
       },
       onError: (errorType, message) => {
         setAudioActive(false);
+        setSttProcessing(false);
+        awaitingTranscriptionRef.current = false;
+        resumeMicDetectIfNeeded();
         console.warn('[InterviewRoom] STT error:', errorType, message);
 
         if (errorType === 'not-supported') {
           setSttError('当前浏览器不支持语音识别，请使用文字输入');
         } else if (errorType === 'not-allowed') {
           setSttError(message || '麦克风权限被拒绝');
+        } else if (errorType === 'config-missing') {
+          setSttError(message || '语音识别配置不完整，请在设置中检查');
         } else if (errorType === 'start-failed') {
           setSttError('语音识别启动失败: ' + (message || ''));
         } else {
-          setSttError('语音识别出错: ' + errorType);
+          setSttError('语音识别出错: ' + (message || errorType));
         }
       },
     });
   };
+
+  startListeningRef.current = startListening;
 
   // 手动提交回答（语音或文字）
   const submitAnswer = () => {
@@ -300,7 +393,7 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
     setPhase('scoring');
     setIsSpeaking(false);
 
-    const answerText = transcriptRef.current || transcript || manualText;
+    const answerText = transcriptRef.current || transcript || manualText || interimText;
     const q = questions[currentIdx];
 
     if (!answerText?.trim()) {
@@ -459,6 +552,7 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
     setHistory(prev => prev.filter(h => h.question !== q.question));
 
     // 停止当前所有语音活动
+    awaitingTranscriptionRef.current = false;
     speechService.stopSpeaking();
     speechService.stopListening();
     setIsSpeaking(false);
@@ -471,6 +565,7 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
 
   // 退出面试间
   const handleExit = () => {
+    awaitingTranscriptionRef.current = false;
     speechService.stopSpeaking();
     speechService.stopListening();
     stopCamera();
@@ -696,7 +791,7 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
               {isLiveTab && phase === 'listening' && !tabHistory && (
                 <div className="ir-answer-box">
                   <div className="ir-answer-label">
-                    {audioActive ? '🎤 正在聆听...' : '🎤 等待语音输入...'}
+                    {sttProcessing ? '⏳ 正在转写语音...' : audioActive ? '🎤 正在聆听...' : '🎤 等待语音输入...'}
                     {liveDuration != null && (
                       <span className="ir-live-duration">{formatDuration(liveDuration)}</span>
                     )}
@@ -728,7 +823,7 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
 
                   {/* 结束作答 + 提交回答 */}
                   <div className="ir-action-bar">
-                    <button className="ir-action-btn ir-action-btn--stop" onClick={finishAnswer}>
+                    <button className="ir-action-btn ir-action-btn--stop" onClick={handleStopAnswer}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                         <rect x="6" y="6" width="12" height="12" rx="2" />
                       </svg>

@@ -9,6 +9,12 @@ const DEFAULT_CONFIG = {
   model: 'glm-5',
   maxTokens: 2048,
   temperature: 0.7,
+  // STT 引擎配置
+  sttEngine: 'web',   // 'web' | 'deepgram' | 'iflytek'
+  deepgramApiKey: '',
+  iflytekAppId: '',
+  iflytekApiKey: '',
+  iflytekApiSecret: '',
 };
 
 /**

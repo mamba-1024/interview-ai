@@ -23,6 +23,10 @@ const STATIC_DIRS = [
   'icons',
 ];
 
+const STATIC_SERVICE_FILES = [
+  'services/iflytek-pcm-processor.js',
+];
+
 async function build() {
   const isWatch = process.argv.includes('--watch');
 
@@ -48,6 +52,17 @@ async function build() {
     if (fs.existsSync(src)) {
       copyDir(src, dest);
       console.log(`  [copy] ${dir}/`);
+    }
+  }
+
+  // Copy standalone service files (e.g. AudioWorklet modules)
+  for (const file of STATIC_SERVICE_FILES) {
+    const src = path.join(ROOT, file);
+    const dest = path.join(DIST, file);
+    if (fs.existsSync(src)) {
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      fs.copyFileSync(src, dest);
+      console.log(`  [copy] ${file}`);
     }
   }
 

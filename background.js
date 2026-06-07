@@ -193,6 +193,65 @@ const messageHandlers = {
   },
 
   /**
+   * Deepgram STT 代理：绕过 CORS 限制，在 background 中调用 Deepgram REST API
+   */
+  async deepgramTranscribe(message) {
+    const { audioBase64, audioType, apiKey } = message;
+    console.log('[Background] deepgramTranscribe called, base64 length:', audioBase64?.length, 'type:', audioType);
+
+    const cleanKey = (apiKey || '').trim().replace(/[^\x20-\x7E]/g, '');
+    if (!cleanKey) {
+      return { success: false, error: 'Deepgram API Key 未配置' };
+    }
+    console.log('[Background] Deepgram key length:', cleanKey.length);
+
+    // 将 base64 还原为 ArrayBuffer
+    const binaryStr = atob(audioBase64);
+    const bytes = new Uint8Array(binaryStr.length);
+    for (let i = 0; i < binaryStr.length; i++) {
+      bytes[i] = binaryStr.charCodeAt(i);
+    }
+    const audioBuffer = bytes.buffer;
+
+    const params = new URLSearchParams({
+      model: 'nova-2',
+      language: 'multi',
+      punctuate: 'true',
+      smart_format: 'true',
+    });
+
+    try {
+      const resp = await fetch(`https://api.deepgram.com/v1/listen?${params}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${cleanKey}`,
+          'Content-Type': audioType || 'audio/webm',
+        },
+        body: audioBuffer,
+      });
+
+      console.log('[Background] Deepgram fetch status:', resp.status);
+
+      if (!resp.ok) {
+        let errMsg = `Deepgram API 错误 (${resp.status})`;
+        try {
+          const errData = await resp.json();
+          errMsg = errData.err_msg || errData.error || errMsg;
+        } catch (e) { /* ignore */ }
+        return { success: false, error: errMsg, status: resp.status };
+      }
+
+      const result = await resp.json();
+      const transcript = result?.results?.channels?.[0]?.alternatives?.[0]?.transcript?.trim() || '';
+      return { success: true, transcript };
+
+    } catch (err) {
+      console.error('[Background] Deepgram fetch error:', err.message);
+      return { success: false, error: err.message };
+    }
+  },
+
+  /**
    * 清除会话
    */
   async clearSession() {

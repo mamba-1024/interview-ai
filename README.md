@@ -2,11 +2,11 @@
 
 **[中文文档](README.zh-CN.md)**
 
-> An AI-powered Chrome extension that automatically parses job descriptions from recruitment websites, generates tailored interview questions, simulates real interview sessions, and provides professional scoring feedback.
+> An AI-powered Chrome extension that automatically parses job descriptions from recruitment websites, generates tailored interview questions, simulates real interview sessions with voice interaction, and provides professional scoring feedback.
 
 ## Why
 
-Preparing for technical interviews is time-consuming — you need to research the role, guess what questions might come up, and practice answering them. This extension automates the entire process: paste a job link, get a customized mock interview in seconds, and receive actionable feedback to improve your performance.
+Preparing for technical interviews is time-consuming — you need to research the role, guess what questions might come up, and practice answering them. This extension automates the entire process: open a job listing, get a customized mock interview in seconds, practice answering out loud, and receive actionable feedback to improve your performance.
 
 ## Features
 
@@ -14,7 +14,9 @@ Preparing for technical interviews is time-consuming — you need to research th
 
 **Custom Question Generation** — Generates 5 interview questions tailored to the role, covering technical depth, project experience, scenario design, and behavioral interview categories. Difficulty adapts to the seniority level.
 
-**Mock Interview Dialogue** — Questions are presented one by one to simulate a real interview pace. The AI interviewer follows up intelligently based on your answers and scores each response in real time.
+**Voice Mock Interview** — The AI interviewer reads questions aloud (TTS), listens to your spoken answers (STT), and displays real-time transcription. You can also type answers manually as a fallback.
+
+**Mock Interview Dialogue** — Questions are presented one by one to simulate a real interview pace. The AI scores each response and supports intelligent follow-up questions.
 
 **Interview Score Report** — Provides an overall score plus multi-dimensional analysis (content depth, logical clarity, expression fluency). Includes per-question feedback, improvement suggestions, and an interviewer summary with readiness assessment.
 
@@ -32,13 +34,53 @@ Preparing for technical interviews is time-consuming — you need to research th
 | LinkedIn | |
 | Nowcoder | |
 
+## Speech Recognition (STT)
+
+The extension supports **3 STT engines**. Configure in **Settings → Speech Recognition**:
+
+| Engine | Mode | Credentials | Best For |
+|--------|------|-------------|----------|
+| **Web Speech API** | Real-time streaming | None (browser built-in) | Quick start, lowest latency |
+| **Deepgram Nova-2** | Real-time WebSocket | [Deepgram API Key](https://console.deepgram.com/) | Higher accuracy, multilingual |
+| **iFlytek** | Real-time WebSocket + PCM | [AppID + APIKey + APISecret](https://console.xfyun.cn/) | Stable in China, long-form answers |
+
+**Interview flow:**
+
+1. AI reads the question via browser TTS
+2. STT starts automatically — speak your answer; text appears in real time
+3. Click **End Answer** to submit for scoring (async engines wait for final results)
+4. Manual text input is always available as a fallback
+
+> **Note:** Deepgram and iFlytek require microphone permission and `AudioWorklet` support (Chrome 66+). iFlytek uses short-lived WebSocket sessions with automatic reconnect for long answers.
+
 ## Tech Stack
 
-- **Manifest V3** — Latest Chrome extension standard
-- **React 18** — Side Panel UI framework
-- **esbuild** — Fast bundler
-- **Chrome Side Panel API** — Native sidebar integration
-- **OpenAI-compatible API** — Works with DeepSeek, Qwen, OpenAI, and more
+| Layer | Technology |
+|-------|------------|
+| Extension | Manifest V3, Chrome Side Panel API |
+| UI | React 18, Side Panel + New Tab modes |
+| Build | esbuild |
+| LLM | OpenAI-compatible API (DashScope, DeepSeek, OpenAI, etc.) |
+| STT | Web Speech API / Deepgram WebSocket / iFlytek WebSocket |
+| Audio | AudioWorklet (16 kHz PCM), Web Speech Synthesis (TTS) |
+| Storage | `chrome.storage` (local + sync) |
+
+## Architecture
+
+```
+Recruitment Site (content.js)
+        │ extract JD
+        ▼
+Background Service Worker (background.js)
+        │ messaging / storage
+        ▼
+Side Panel (sidepanel.jsx)
+        ├── JD analysis & question generation (services/ai.js)
+        └── Interview Room (components/InterviewRoom.jsx)
+                ├── TTS: read questions aloud
+                ├── STT: services/speech.js
+                └── Scoring: LLM API
+```
 
 ## Installation
 
@@ -49,6 +91,7 @@ Preparing for technical interviews is time-consuming — you need to research th
 ### Developer Mode (Local Build)
 
 1. Clone and install dependencies:
+
 ```bash
 git clone https://github.com/mamba-1024/interview-ai.git
 cd interview-ai
@@ -56,6 +99,7 @@ npm install
 ```
 
 2. Build the extension:
+
 ```bash
 npm run build
 ```
@@ -68,7 +112,9 @@ npm run build
 
 ## Configuration
 
-After installing, open the side panel and go to **Settings** to configure your AI service:
+Open the side panel and go to **Settings**.
+
+### LLM (required)
 
 | Field | Description | Example |
 |-------|-------------|---------|
@@ -76,7 +122,7 @@ After installing, open the side panel and go to **Settings** to configure your A
 | API Key | Your API key | `sk-xxxxxxxx` |
 | Model | Model name | `qwen-turbo` / `deepseek-chat` / `gpt-4o` |
 
-Any OpenAI-compatible API is supported, including but not limited to:
+Supported providers (OpenAI-compatible):
 
 - Alibaba Cloud DashScope (Qwen)
 - DeepSeek
@@ -84,42 +130,50 @@ Any OpenAI-compatible API is supported, including but not limited to:
 - Zhipu GLM
 - Self-hosted Ollama
 
+### Speech Recognition (optional)
+
+| Engine | Fields |
+|--------|--------|
+| Web Speech API | No extra config (default) |
+| Deepgram | API Key |
+| iFlytek | AppID, APIKey, APISecret |
+
 ## Quick Start
 
 1. Open any job listing on a supported recruitment website
 2. Click the purple AI floating button on the page
 3. Select **"Extract & Analyze JD"**
 4. Review the AI analysis results and generated questions
-5. Click **"Start Mock Interview"** to begin the interview dialogue
-6. Complete all questions and view your interview score report
+5. Click **"Start Mock Interview"** to enter the interview room
+6. Allow microphone access when prompted; answer each question by voice or text
+7. Click **"End Answer"** after each response; view your score report when finished
 
 ## Project Structure
 
 ```
 interview-ai/
-├── manifest.json          # Extension manifest
-├── background.js          # Service Worker (background script)
-├── content.js             # Content script (injected into job sites)
-├── content.css            # Content script styles (floating button)
-├── sidepanel.jsx          # Side Panel main UI (React)
-├── sidepanel.html         # Side Panel HTML entry
-├── popup.html             # Popup page
-├── popup.js               # Popup logic
+├── manifest.json              # Extension manifest
+├── background.js              # Service Worker (messaging, storage, API proxy)
+├── content.js                 # Content script (JD extraction, floating button)
+├── content.css
+├── sidepanel.jsx              # Side Panel main UI (React)
+├── sidepanel.html
+├── popup.html / popup.js
+├── components/
+│   ├── InterviewRoom.jsx      # Mock interview UI (voice, scoring, camera)
+│   └── InterviewAvatar.jsx    # Interviewer avatar animation
 ├── services/
-│   ├── ai.js              # AI service wrapper (LLM API calls)
-│   ├── jd-parser.js       # Job site JD parsers
-│   └── storage.js         # Local storage management
+│   ├── ai.js                  # LLM API wrapper
+│   ├── speech.js              # STT (3 engines) + TTS
+│   ├── jd-parser.js           # Job site JD parsers
+│   ├── iflytek-pcm-processor.js  # AudioWorklet (16 kHz PCM capture)
+│   └── storage.js             # Chrome storage wrapper
 ├── sidepanel/styles/
-│   └── sidepanel.css      # Side Panel styles
-├── icons/                 # Extension icons
 ├── scripts/
-│   ├── build.js           # esbuild build script
-│   └── generate-icons.js  # Icon generation script
-├── store/                 # Chrome Web Store assets
-│   ├── screenshots/       # Store screenshots & promo images
-│   ├── privacy-policy.html
-│   └── chrome-web-store-listing.md
-└── privacy-policy.html    # Privacy policy (hosted on GitHub Pages)
+│   ├── build.js               # esbuild + static asset copy
+│   └── generate-icons.js
+├── store/                     # Chrome Web Store assets
+└── dist/                      # Build output (load this in Chrome)
 ```
 
 ## Development
@@ -135,7 +189,7 @@ npm run build
 npm run icons
 ```
 
-Build output is written to the `dist/` directory. Load this folder as an unpacked extension during development.
+Build output is written to the `dist/` directory. Reload the extension in `chrome://extensions/` after each build.
 
 ## Screenshots
 
@@ -153,7 +207,10 @@ Build output is written to the `dist/` directory. Load this folder as an unpacke
 
 ## Privacy
 
-All data (API keys, interview history, settings) is stored **locally** in your browser using `chrome.storage`. The extension does not collect, upload, or share any user data with third-party servers. AI API calls are made directly from your browser to your configured AI provider.
+- **Local storage:** API keys, interview history, and settings are stored in your browser via `chrome.storage`.
+- **LLM requests:** Sent directly from the extension to your configured AI provider.
+- **STT requests:** When using Deepgram or iFlytek, audio is streamed to their respective APIs. Web Speech API processing depends on your browser vendor.
+- The extension does not operate its own backend or collect user data on a central server.
 
 See the full [Privacy Policy](https://mamba-1024.github.io/interview-ai/privacy-policy.html).
 

@@ -91,6 +91,12 @@ function App() {
   const [apiUrl, setApiUrl] = useState('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions');
   const [apiKey, setApiKey] = useState('');
   const [model, setModel] = useState('glm-5');
+  // STT 引擎配置
+  const [sttEngine, setSttEngine] = useState('web'); // 'web' | 'deepgram' | 'iflytek'
+  const [deepgramApiKey, setDeepgramApiKey] = useState('');
+  const [iflytekAppId, setIflytekAppId] = useState('');
+  const [iflytekApiKey, setIflytekApiKey] = useState('');
+  const [iflytekApiSecret, setIflytekApiSecret] = useState('');
 
   // Home state
   const [jd, setJd] = useState(null);
@@ -148,6 +154,14 @@ function App() {
     setConfig(cfg);
     if (cfg.apiUrl) setApiUrl(cfg.apiUrl);
     if (cfg.model) setModel(cfg.model);
+    if (cfg.sttEngine) {
+      const validStt = ['web', 'deepgram', 'iflytek'];
+      setSttEngine(validStt.includes(cfg.sttEngine) ? cfg.sttEngine : 'web');
+    }
+    if (cfg.deepgramApiKey) setDeepgramApiKey(cfg.deepgramApiKey);
+    if (cfg.iflytekAppId) setIflytekAppId(cfg.iflytekAppId);
+    if (cfg.iflytekApiKey) setIflytekApiKey(cfg.iflytekApiKey);
+    if (cfg.iflytekApiSecret) setIflytekApiSecret(cfg.iflytekApiSecret);
 
     if (!cfg.apiKey) {
       setScreen('setup');
@@ -510,11 +524,67 @@ function App() {
           <label>模型名称</label>
           <input type="text" value={model} onChange={(e) => setModel(e.target.value)} />
         </div>
+      </div>
+
+      <div className="sp-section-title" style={{ marginTop: 12 }}>
+        <Icons.Zap size={14} /> 语音识别设置
+      </div>
+      <div className="sp-form">
+        <div className="sp-form-group">
+          <label>语音识别引擎</label>
+          <select value={sttEngine} onChange={(e) => setSttEngine(e.target.value)}
+            style={{
+              width: '100%', padding: '8px 10px', borderRadius: 8,
+              border: '1px solid var(--border)', background: 'var(--bg)',
+              color: 'var(--text)', fontSize: 13, outline: 'none',
+            }}>
+            <option value="web">浏览器原生 Web Speech API</option>
+            <option value="deepgram">Deepgram Nova-2（实时流式，需 API Key）</option>
+            <option value="iflytek">科大讯飞（实时流式，需 AppID + Key + Secret）</option>
+          </select>
+        </div>
+        {sttEngine === 'deepgram' && (
+          <div className="sp-form-group">
+            <label>Deepgram API Key</label>
+            <input type="password" value={deepgramApiKey} onChange={(e) => setDeepgramApiKey(e.target.value)}
+              placeholder={config?.deepgramApiKey ? '•••••••• (已配置)' : 'your-api-key...'} />
+            <span style={{ fontSize: 11, color: 'var(--text-light)', marginTop: 2, display: 'block' }}>
+              免费获取：console.deepgram.com（含 $200 免费额度）
+            </span>
+          </div>
+        )}
+        {sttEngine === 'iflytek' && (
+          <>
+            <div className="sp-form-group">
+              <label>讯飞 AppID</label>
+              <input type="text" value={iflytekAppId} onChange={(e) => setIflytekAppId(e.target.value)}
+                placeholder={config?.iflytekAppId || 'AppID'} />
+            </div>
+            <div className="sp-form-group">
+              <label>讯飞 APIKey</label>
+              <input type="password" value={iflytekApiKey} onChange={(e) => setIflytekApiKey(e.target.value)}
+                placeholder={config?.iflytekApiKey ? '•••••••• (已配置)' : 'APIKey'} />
+            </div>
+            <div className="sp-form-group">
+              <label>讯飞 APISecret</label>
+              <input type="password" value={iflytekApiSecret} onChange={(e) => setIflytekApiSecret(e.target.value)}
+                placeholder={config?.iflytekApiSecret ? '•••••••• (已配置)' : 'APISecret'} />
+            </div>
+            <span style={{ fontSize: 11, color: 'var(--text-light)', marginTop: 2, display: 'block' }}>
+              免费获取：console.xfyun.cn（语音听写每日 500 次免费）
+            </span>
+          </>
+        )}
         <button className="sp-action-btn primary" style={{ width: '100%' }} onClick={async () => {
           const newConfig = {
             apiUrl: apiUrl.trim() || config?.apiUrl,
             apiKey: apiKey.trim() || config?.apiKey,
             model: model.trim() || config?.model,
+            sttEngine,
+            deepgramApiKey: deepgramApiKey.trim() || config?.deepgramApiKey || '',
+            iflytekAppId: iflytekAppId.trim() || config?.iflytekAppId || '',
+            iflytekApiKey: iflytekApiKey.trim() || config?.iflytekApiKey || '',
+            iflytekApiSecret: iflytekApiSecret.trim() || config?.iflytekApiSecret || '',
           };
           await sendMsg('saveConfig', { config: newConfig });
           setConfig(newConfig);
