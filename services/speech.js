@@ -60,6 +60,69 @@ class SpeechService {
     this._iflytekSpillPcm = null; // 重连间隙暂存 PCM
     // 防重复启动 debounce
     this._startDebounceTimer = null;
+    // TTS 语音列表（Chrome 异步加载，需监听 voiceschanged）
+    this._ttsVoices = [];
+    this._initTtsVoices();
+  }
+
+  _initTtsVoices() {
+    if (!this.synth) return;
+    const refresh = () => {
+      const list = this.synth.getVoices();
+      if (list.length) this._ttsVoices = list;
+    };
+    refresh();
+    if (typeof this.synth.addEventListener === 'function') {
+      this.synth.addEventListener('voiceschanged', refresh);
+    } else {
+      this.synth.onvoiceschanged = refresh;
+    }
+  }
+
+  _getTtsVoices() {
+    if (this._ttsVoices.length) return this._ttsVoices;
+    const list = this.synth?.getVoices() || [];
+    if (list.length) this._ttsVoices = list;
+    return this._ttsVoices;
+  }
+
+  /**
+   * 按面试官性别选择中文 TTS 语音（兼容 macOS / Windows / Chrome 各平台命名）
+   * @returns {{ voice: SpeechSynthesisVoice | null, pitch: number }}
+   */
+  _pickTtsVoice() {
+    const voices = this._getTtsVoices();
+    const zhVoices = voices.filter(v => /^zh/i.test(v.lang));
+    const isMale = this.gender === 'male';
+
+    const femaleRe = /female|女|ting.?ting|tian.?tian|meijia|sin.?ji|yaoyao|huihui|yu.?shu|xiaoxiao|xiaoyi|lili|xiaohan|xiaomeng|google.*普通话|google.*國語|google.*粤語|cantonese|sinji/i;
+    const maleRe = /male|男|kangkang|kang.?kang|li.?mu|limu|yunxi|yunyang|siri_male|云希|云扬|康康|李牧/i;
+
+    const voiceText = (v) => `${v.name} ${v.voiceURI || ''}`;
+    const isFemaleVoice = (v) => femaleRe.test(voiceText(v));
+    const isMaleVoice = (v) => maleRe.test(voiceText(v));
+
+    if (isMale) {
+      const maleVoice = zhVoices.find(isMaleVoice);
+      if (maleVoice) return { voice: maleVoice, pitch: 0.9 };
+
+      const neutral = zhVoices.find(v => !isFemaleVoice(v) && !isMaleVoice(v));
+      if (neutral) return { voice: neutral, pitch: 0.78 };
+
+      const notFemale = zhVoices.find(v => !isFemaleVoice(v));
+      if (notFemale) return { voice: notFemale, pitch: 0.72 };
+
+      const fallback = zhVoices.find(v => !v.default) || zhVoices[1] || voices.find(v => isMaleVoice(v));
+      return { voice: fallback || zhVoices[0] || voices[0] || null, pitch: 0.65 };
+    }
+
+    const femaleVoice = zhVoices.find(isFemaleVoice);
+    if (femaleVoice) return { voice: femaleVoice, pitch: 1.05 };
+
+    const notMale = zhVoices.find(v => !isMaleVoice(v));
+    if (notMale) return { voice: notMale, pitch: 1.1 };
+
+    return { voice: zhVoices[0] || voices[0] || null, pitch: 1.15 };
   }
 
   /**
@@ -1649,6 +1712,24 @@ class SpeechService {
       return;
     }
 
+    if (!this._getTtsVoices().length) {
+      const retry = () => {
+        const list = this.synth.getVoices();
+        if (list.length) this._ttsVoices = list;
+        if (typeof this.synth.removeEventListener === 'function') {
+          this.synth.removeEventListener('voiceschanged', retry);
+        }
+        this.speak(text, callbacks);
+      };
+      if (typeof this.synth.addEventListener === 'function') {
+        this.synth.addEventListener('voiceschanged', retry);
+      } else {
+        this.synth.onvoiceschanged = retry;
+      }
+      this.synth.getVoices();
+      return;
+    }
+
     this.stopSpeaking();
 
     const utterance = new SpeechSynthesisUtterance(text);
@@ -1656,21 +1737,9 @@ class SpeechService {
     utterance.rate = 1.0;
     utterance.volume = 1.0;
 
-    // 根据性别调整音调和语音
-    const voices = this.synth.getVoices();
-    const zhVoices = voices.filter(v => v.lang.startsWith('zh'));
-
-    if (this.gender === 'male') {
-      utterance.pitch = 0.8;
-      // 优先选名称中含 male/男 的中文语音，否则取第一个
-      const maleVoice = zhVoices.find(v => /male|男/i.test(v.name));
-      utterance.voice = maleVoice || zhVoices[0] || voices[0];
-    } else {
-      utterance.pitch = 1.2;
-      // 优先选名称中含 female/女 的中文语音，否则取第一个
-      const femaleVoice = zhVoices.find(v => /female|女/i.test(v.name));
-      utterance.voice = femaleVoice || zhVoices[0] || voices[0];
-    }
+    const { voice, pitch } = this._pickTtsVoice();
+    utterance.pitch = pitch;
+    if (voice) utterance.voice = voice;
 
     utterance.onstart = () => {
       this.isSpeaking = true;

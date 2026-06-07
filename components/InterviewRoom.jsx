@@ -86,7 +86,7 @@ const InterviewRoom = ({ questions, jdAnalysis, aiService, onComplete, onExit })
       speechService.stopListening();
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, []);
+  }, [gender]);
 
   // 计时器
   useEffect(() => {
