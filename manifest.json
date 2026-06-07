@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI模拟面试 - InterviewAI",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "AI模拟面试助手：自动识别招聘网站岗位描述，一键生成面试题，支持AI追问和评分",
   "permissions": [
     "sidePanel",
